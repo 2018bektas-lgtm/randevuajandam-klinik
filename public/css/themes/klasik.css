@@ -1,0 +1,4 @@
+/* Klasik Klinik — base site.css varsayılanı; hafif ince ayar */
+body.theme-klasik {
+  --radius: 1.25rem;
+}
