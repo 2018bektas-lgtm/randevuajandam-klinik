@@ -148,6 +148,122 @@ class FinansController extends Controller
         return view('panel.finans.hasta_bakiyeleri', compact('hastalar'));
     }
 
+    /**
+     * Hasta cari hesap sayfası (platform API).
+     */
+    public function hastaHesap(int $hastaId)
+    {
+        try {
+            $data = $this->api->get('/finans/hasta/'.$hastaId)['data'] ?? [];
+            $hizmetler = $this->api->get('/hizmetler')['data'] ?? [];
+            $kategoriler = $this->api->get('/finans/kategoriler')['data'] ?? [];
+        } catch (RuntimeException $e) {
+            return redirect()->route('panel.finans.hasta-bakiyeleri')->with('hata', $e->getMessage());
+        }
+
+        $hasta = (object) ($data['hasta'] ?? []);
+        if (empty($hasta->id) && empty($hasta->ad_soyad)) {
+            return redirect()->route('panel.finans.hasta-bakiyeleri')->with('hata', 'Hasta hesabı bulunamadı.');
+        }
+        $hasta->id = $hasta->id ?? $hastaId;
+        $hasta->ad_soyad = $hasta->ad_soyad ?? trim(($hasta->ad ?? '').' '.($hasta->soyad ?? ''));
+
+        $ozet = $data['ozet'] ?? [];
+        $toplamBorc = (float) ($ozet['toplam_borc'] ?? 0);
+        $toplamOdenen = (float) ($ozet['toplam_odenen'] ?? 0);
+        $kalanBakiye = (float) ($ozet['kalan_bakiye'] ?? ($toplamBorc - $toplamOdenen));
+
+        $faturalar = ApiData::collection($data['faturalar'] ?? []);
+        $acikFaturalar = ApiData::collection($data['acik_faturalar'] ?? []);
+        $hizmetler = ApiData::collection($hizmetler);
+        $gelirKategorileri = ApiData::collection(collect($kategoriler)->where('tur', 'gelir')->values()->all());
+
+        $hareketler = $faturalar->map(function ($f) {
+            $tutar = (float) ($f->tutar ?? 0);
+            $odenen = (float) ($f->odenen_tutar ?? 0);
+            $kalemler = collect($f->kalemler ?? [])->map(function ($k) {
+                $k = is_array($k) ? (object) $k : $k;
+                if (is_string($k->tarih ?? null) && ! ($k->tarih instanceof \DateTimeInterface)) {
+                    try {
+                        $k->tarih = Carbon::parse($k->tarih);
+                    } catch (\Throwable) {
+                        // keep string
+                    }
+                }
+
+                return $k;
+            });
+
+            return [
+                'tip' => 'borc',
+                'tarih' => $f->odeme_tarihi ?? null,
+                'baslik' => $f->hizmet ?? ($f->aciklama ?: 'Borç / hizmet kaydı'),
+                'aciklama' => $f->aciklama ?? null,
+                'tutar' => $tutar,
+                'odenen' => $odenen,
+                'kalan' => (float) ($f->kalan ?? max(0, $tutar - $odenen)),
+                'durum' => $f->durum ?? 'beklemede',
+                'odeme_id' => $f->id ?? null,
+                'kalemler' => $kalemler,
+            ];
+        })->sortByDesc('tarih')->values();
+
+        return view('panel.finans.hasta_hesap', compact(
+            'hasta',
+            'toplamBorc',
+            'toplamOdenen',
+            'kalanBakiye',
+            'acikFaturalar',
+            'hizmetler',
+            'gelirKategorileri',
+            'hareketler',
+        ));
+    }
+
+    public function hastaTahsilat(Request $request, int $hastaId)
+    {
+        $data = $request->validate([
+            'odeme_id' => ['required', 'integer'],
+            'tutar' => ['required', 'numeric', 'min:0.01'],
+            'tarih' => ['required', 'date'],
+            'odeme_yontemi' => ['required', 'in:nakit,kredi_karti,havale,online'],
+            'not' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $this->api->post('/finans/hasta/'.$hastaId.'/tahsilat', $data);
+        } catch (RuntimeException $e) {
+            return back()->with('hata', $e->getMessage())->withInput();
+        }
+
+        return redirect()
+            ->route('panel.finans.hasta-hesap', $hastaId)
+            ->with('basari', 'Tahsilat kaydedildi.');
+    }
+
+    public function hastaBorcEkle(Request $request, int $hastaId)
+    {
+        $data = $request->validate([
+            'tutar' => ['required', 'numeric', 'min:0.01'],
+            'odeme_tarihi' => ['required', 'date'],
+            'hizmet_id' => ['nullable', 'integer'],
+            'finans_kategori_id' => ['nullable', 'integer'],
+            'aciklama' => ['nullable', 'string', 'max:1000'],
+            'ilk_odeme_tutar' => ['nullable', 'numeric', 'min:0'],
+            'ilk_odeme_yontemi' => ['nullable', 'in:nakit,kredi_karti,havale,online'],
+        ]);
+
+        try {
+            $this->api->post('/finans/hasta/'.$hastaId.'/borc', $data);
+        } catch (RuntimeException $e) {
+            return back()->with('hata', $e->getMessage())->withInput();
+        }
+
+        return redirect()
+            ->route('panel.finans.hasta-hesap', $hastaId)
+            ->with('basari', 'Borç kaydı oluşturuldu.');
+    }
+
     public function raporPdf(Request $request)
     {
         try {

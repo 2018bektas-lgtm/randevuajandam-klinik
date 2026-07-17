@@ -201,6 +201,9 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::get('/finans/giderler', [FinansController::class, 'giderler'])->name('finans.giderler');
             Route::get('/finans/kategoriler', [FinansController::class, 'kategoriler'])->name('finans.kategoriler');
             Route::get('/finans/hasta-bakiyeleri', [FinansController::class, 'hastaBakiyeleri'])->name('finans.hasta-bakiyeleri');
+            Route::get('/finans/hasta/{hastaId}', [FinansController::class, 'hastaHesap'])->name('finans.hasta-hesap')->whereNumber('hastaId');
+            Route::post('/finans/hasta/{hastaId}/tahsilat', [FinansController::class, 'hastaTahsilat'])->name('finans.hasta-tahsilat')->whereNumber('hastaId');
+            Route::post('/finans/hasta/{hastaId}/borc', [FinansController::class, 'hastaBorcEkle'])->name('finans.hasta-borc')->whereNumber('hastaId');
             Route::get('/finans/rapor/pdf', [FinansController::class, 'raporPdf'])->name('finans.rapor-pdf');
             Route::post('/finans/gelirler', [FinansController::class, 'storeGelir'])->name('finans.gelir.store');
             Route::post('/finans/gelirler/store', [FinansController::class, 'storeGelir'])->name('finans.gelirler.store');
