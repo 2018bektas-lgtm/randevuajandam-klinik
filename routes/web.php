@@ -9,10 +9,12 @@ use App\Http\Controllers\Panel\EgitimController;
 use App\Http\Controllers\Panel\FaqController;
 use App\Http\Controllers\Panel\FinansController;
 use App\Http\Controllers\Panel\GaleriController;
+use App\Http\Controllers\Panel\GorusmeController;
 use App\Http\Controllers\Panel\HizmetController;
 use App\Http\Controllers\Panel\ProfilController;
 use App\Http\Controllers\Panel\RandevuController;
 use App\Http\Controllers\Panel\SiteAyarlariController;
+use App\Http\Controllers\Panel\TwoFactorController;
 use App\Http\Controllers\Panel\YorumController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +66,13 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
     Route::get('/giris', [AuthController::class, 'girisFormu'])->name('giris');
     Route::post('/giris', [AuthController::class, 'giris'])->middleware('throttle:12,1')->name('giris.post');
     Route::post('/cikis', [AuthController::class, 'cikis'])->name('cikis');
+
+    // 2FA challenge (şifre sonrası, henüz panel oturumu yok)
+    Route::get('/2fa', [TwoFactorController::class, 'challengeForm'])->name('two-factor.challenge');
+    Route::post('/2fa', [TwoFactorController::class, 'challengeVerify'])
+        ->middleware('throttle:12,1')
+        ->name('two-factor.challenge.post');
+    Route::post('/2fa/iptal', [TwoFactorController::class, 'challengeCancel'])->name('two-factor.challenge.cancel');
 
     Route::middleware('panel.auth')->group(function () {
         // Yerel panel — API zorunlu değil
@@ -119,6 +128,15 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::get('/sifre', [ProfilController::class, 'sifreFormu'])->name('sifre');
             Route::put('/sifre', [ProfilController::class, 'sifreGuncelle'])->name('sifre.update');
             Route::post('/sifre', [ProfilController::class, 'sifreGuncelle'])->name('sifre.post');
+
+            // 2FA yönetimi
+            Route::get('/2fa/ayarlar', [TwoFactorController::class, 'setupForm'])->name('two-factor');
+            Route::post('/2fa/onayla', [TwoFactorController::class, 'setupConfirm'])->name('two-factor.confirm');
+            Route::post('/2fa/kapat', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+            Route::post('/2fa/yedek-kodlar', [TwoFactorController::class, 'regenerateRecovery'])->name('two-factor.recovery');
+
+            // Online görüşme (platform WebRTC odasına yönlendirir)
+            Route::get('/gorusme/{id}', [GorusmeController::class, 'join'])->whereNumber('id')->name('gorusme.join');
 
             Route::get('/randevular', [RandevuController::class, 'index'])->name('randevular');
             Route::get('/randevular/events', [RandevuController::class, 'events'])->name('randevular.events');

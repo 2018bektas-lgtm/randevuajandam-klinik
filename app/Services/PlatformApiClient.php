@@ -125,6 +125,23 @@ class PlatformApiClient
         return $this->decode($res);
     }
 
+    /**
+     * Complete login after 2FA challenge (no bearer yet).
+     */
+    public function verifyTwoFactor(string $challengeToken, string $code): array
+    {
+        if (! $this->isConfigured()) {
+            throw new RuntimeException('API anahtarı yapılandırılmamış.', 0);
+        }
+
+        $res = $this->http()->post($this->doctorBase().'/auth/two-factor', [
+            'challenge_token' => $challengeToken,
+            'code' => $code,
+        ]);
+
+        return $this->decode($res);
+    }
+
     public function logout(): void
     {
         try {

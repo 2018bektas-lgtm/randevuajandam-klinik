@@ -76,8 +76,20 @@ class AuthController extends Controller
         if ($this->apiConfig->isConfigured() && ! $keyBroken) {
             try {
                 $res = $this->api->login($email, $sifre);
-                $token = $res['data']['token'] ?? null;
-                $doktor = $res['data']['doktor'] ?? null;
+                $data = $res['data'] ?? [];
+
+                // 2FA gerekli — token henüz yok
+                if (! empty($data['requires_two_factor']) && ! empty($data['challenge_token'])) {
+                    session([
+                        'two_factor.challenge_token' => $data['challenge_token'],
+                        'two_factor.email' => $email,
+                    ]);
+
+                    return redirect()->route('panel.two-factor.challenge');
+                }
+
+                $token = $data['token'] ?? null;
+                $doktor = $data['doktor'] ?? null;
                 if ($token && $doktor) {
                     $this->api->setToken($token);
                     $this->api->setUser(is_array($doktor) ? $doktor : (array) $doktor);

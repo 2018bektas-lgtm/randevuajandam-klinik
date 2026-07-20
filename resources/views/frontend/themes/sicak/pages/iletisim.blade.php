@@ -1,4 +1,4 @@
-@extends(theme_layout())
+﻿@extends(theme_layout())
 
 @php
     $iletisim = $doktor['iletisim_sayfa'] ?? [];
@@ -130,14 +130,14 @@
                         <label>Not</label>
                         <textarea name="not" id="not" rows="3" maxlength="1000" placeholder="Kısaca belirtmek istediğiniz bir şey var mı?"></textarea>
                     </div>
-                    <div class="field full" id="gorusme-tipi-block">
+                    <div class="field full" id="gorusme-tipi-block" style="display:none">
                         <label>Görüşme türü *</label>
                         <div style="display:flex;flex-direction:column;gap:.45rem;margin-top:.35rem">
                             <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer">
                                 <input type="radio" name="gorusme_tipi" value="yuz_yuze" checked> Yüz yüze
                             </label>
                             <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer">
-                                <input type="radio" name="gorusme_tipi" value="online"> Online Görüşme
+                                <input type="radio" name="gorusme_tipi" value="online"> Online görüşme
                             </label>
                         </div>
                         <p class="text-muted" style="margin:.4rem 0 0;font-size:.78rem;line-height:1.4">
@@ -202,4 +202,8 @@
     </div>
 </section>
 </div>
+
+@if($formGoster)
+@include('frontend.partials.guest-booking-assets')
+@endif
 @endsection

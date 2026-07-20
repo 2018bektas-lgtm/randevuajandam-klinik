@@ -337,9 +337,13 @@
         const joinBox = document.getElementById('evOnlineJoin');
         const joinLink = document.getElementById('evJoinLink');
         if (joinBox && joinLink) {
-            if (gorusmeTipi === 'online' && props.platform_join_url && props.durum === 'onaylandi') {
+            const rid = props.randevu_id || (ev.id && String(ev.id).replace(/^randevu_/, ''));
+            const localJoin = rid ? @json(url('/yonetim/gorusme')).replace(/\/?$/, '/') + rid : null;
+            const hekimJoin = props.hekim_join_url || localJoin;
+            if (gorusmeTipi === 'online' && hekimJoin && props.durum === 'onaylandi') {
                 joinBox.classList.remove('hidden');
-                joinLink.href = props.platform_join_url;
+                joinLink.href = localJoin || hekimJoin;
+                joinLink.removeAttribute('target');
             } else {
                 joinBox.classList.add('hidden');
             }
