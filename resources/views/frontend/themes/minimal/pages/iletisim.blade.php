@@ -137,7 +137,7 @@
                                 <input type="radio" name="gorusme_tipi" value="yuz_yuze" checked> Yüz yüze
                             </label>
                             <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;cursor:pointer">
-                                <input type="radio" name="gorusme_tipi" value="online"> Online — platform üzerinden görüntülü (Zoom yok)
+                                <input type="radio" name="gorusme_tipi" value="online"> Online Görüşme
                             </label>
                         </div>
                         <p class="text-muted" style="margin:.4rem 0 0;font-size:.78rem;line-height:1.4">

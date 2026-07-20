@@ -106,7 +106,7 @@
                 </div>
             </div>
             <div id="evOnlineJoin" class="hidden rounded-xl border border-sky-100 bg-sky-50 p-3 space-y-2">
-                <p class="text-[11px] text-sky-900 font-semibold">📹 Online görüşme — platform üzerinden (Zoom yok)</p>
+                <p class="text-[11px] text-sky-900 font-semibold">📹 Online görüşme</p>
                 <a id="evJoinLink" href="#" target="_blank" rel="noopener"
                    class="inline-flex px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">Görüşmeye Katıl →</a>
             </div>
@@ -174,7 +174,7 @@
                         <input type="radio" name="gorusme_tipi" value="yuz_yuze" checked> Yüz yüze
                     </label>
                     <label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 cursor-pointer">
-                        <input type="radio" name="gorusme_tipi" value="online"> Online (platform)
+                        <input type="radio" name="gorusme_tipi" value="online"> Online Görüşme
                     </label>
                 </div>
                 <p class="mt-1 text-[10px] text-slate-500">Online da aynı slotu kapatır. Pakette “online görüşme” yoksa kayıt reddedilir.</p>
@@ -329,7 +329,7 @@
         const gorusmeTipi = props.gorusme_tipi || 'yuz_yuze';
         const gorusmeEl = document.getElementById('evGorusmeTipi');
         if (gorusmeEl) {
-            gorusmeEl.textContent = gorusmeTipi === 'online' ? '📹 Online (platform)' : 'Yüz yüze';
+            gorusmeEl.textContent = gorusmeTipi === 'online' ? '📹 Online görüşme' : 'Yüz yüze';
             gorusmeEl.className = gorusmeTipi === 'online'
                 ? 'text-xs font-bold text-sky-700'
                 : 'text-xs font-bold text-slate-600';
