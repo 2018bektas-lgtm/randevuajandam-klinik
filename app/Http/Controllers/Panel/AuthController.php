@@ -64,12 +64,15 @@ class AuthController extends Controller
         $apiError = null;
         $doktor = null;
         $keyBroken = false;
+        $siteOwnerDoktorId = null;
 
         if ($this->apiConfig->isConfigured()) {
             $probe = $this->apiConfig->testConnection();
             if (! ($probe['ok'] ?? false)) {
                 $keyBroken = true;
                 $apiError = $probe['message'] ?? 'Geçersiz veya pasif API anahtarı.';
+            } else {
+                $siteOwnerDoktorId = $probe['doktor']['id'] ?? null;
             }
         }
 
@@ -83,6 +86,7 @@ class AuthController extends Controller
                     session([
                         'two_factor.challenge_token' => $data['challenge_token'],
                         'two_factor.email' => $email,
+                        'two_factor.expected_doktor_id' => $siteOwnerDoktorId,
                     ]);
 
                     return redirect()->route('panel.two-factor.challenge');
@@ -91,10 +95,17 @@ class AuthController extends Controller
                 $token = $data['token'] ?? null;
                 $doktor = $data['doktor'] ?? null;
                 if ($token && $doktor) {
+                    $d = is_array($doktor) ? $doktor : (array) $doktor;
+                    $loginDoktorId = $d['id'] ?? null;
+                    if ($siteOwnerDoktorId && $loginDoktorId && (string) $siteOwnerDoktorId !== (string) $loginDoktorId) {
+                        $this->api->setToken(null);
+
+                        return back()->withInput()->with('hata', 'Bu hesabın bu siteye giriş yetkisi bulunmamaktadır.');
+                    }
+
                     $this->api->setToken($token);
-                    $this->api->setUser(is_array($doktor) ? $doktor : (array) $doktor);
+                    $this->api->setUser($d);
                     $apiOk = true;
-                    $this->syncLocalUser($email, $sifre, $doktor);
                 }
             } catch (RuntimeException $e) {
                 $apiError = $e->getMessage();
@@ -106,7 +117,11 @@ class AuthController extends Controller
         }
 
         if (! $apiOk) {
-            $user = User::query()->whereRaw('LOWER(email) = ?', [$email])->first();
+            $localAdminEmail = strtolower(trim($this->localAdminEmail()));
+            $user = ($localAdminEmail && $email === $localAdminEmail)
+                ? User::query()->whereRaw('LOWER(email) = ?', [$email])->first()
+                : null;
+
             if (! $user || ! Hash::check($sifre, $user->password)) {
                 if ($keyBroken || $this->isApiKeyError((string) $apiError)) {
                     return back()->withInput()->with(

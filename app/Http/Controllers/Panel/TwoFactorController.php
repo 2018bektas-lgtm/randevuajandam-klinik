@@ -46,11 +46,19 @@ class TwoFactorController extends Controller
             return back()->withErrors(['code' => 'Doğrulama tamamlanamadı. Tekrar deneyin.']);
         }
 
-        $request->session()->forget(['two_factor.challenge_token', 'two_factor.email']);
-        $this->api->setToken($token);
-        $this->api->setUser(is_array($doktor) ? $doktor : (array) $doktor);
-
         $d = is_array($doktor) ? $doktor : (array) $doktor;
+        $expectedDoktorId = $request->session()->get('two_factor.expected_doktor_id');
+        $loginDoktorId = $d['id'] ?? null;
+        if ($expectedDoktorId && $loginDoktorId && (string) $expectedDoktorId !== (string) $loginDoktorId) {
+            $request->session()->forget(['two_factor.challenge_token', 'two_factor.email', 'two_factor.expected_doktor_id']);
+
+            return redirect()->route('panel.giris')->with('hata', 'Bu hesabın bu siteye giriş yetkisi bulunmamaktadır.');
+        }
+
+        $request->session()->forget(['two_factor.challenge_token', 'two_factor.email', 'two_factor.expected_doktor_id']);
+        $this->api->setToken($token);
+        $this->api->setUser($d);
+
         session([
             'panel_auth' => [
                 'mode' => 'api',
