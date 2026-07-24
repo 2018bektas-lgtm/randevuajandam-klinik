@@ -538,6 +538,8 @@ class RandevuController extends Controller
             'iptal_saat_limiti' => ['required', 'integer', 'min:0', 'max:168'],
             'gunluk_maksimum_randevu' => ['required', 'integer', 'min:0', 'max:200'],
             'aktif_mi' => ['nullable'],
+            'online_randevu_aktif' => ['nullable'],
+            'yuzyuze_randevu_aktif' => ['nullable'],
             'email_bildirimleri' => ['nullable'],
             'sms_bildirimleri' => ['nullable'],
         ]);
@@ -551,6 +553,8 @@ class RandevuController extends Controller
             'iptal_saat_limiti' => (int) $data['iptal_saat_limiti'],
             'gunluk_maksimum_randevu' => (int) $data['gunluk_maksimum_randevu'],
             'aktif_mi' => $request->boolean('aktif_mi'),
+            'online_randevu_aktif' => $request->boolean('online_randevu_aktif'),
+            'yuzyuze_randevu_aktif' => $request->boolean('yuzyuze_randevu_aktif'),
             'email_bildirimleri' => $request->boolean('email_bildirimleri'),
             'sms_bildirimleri' => $request->boolean('sms_bildirimleri'),
         ];

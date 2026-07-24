@@ -45,7 +45,9 @@
         </div>
     </div>
     <div class="flex flex-wrap gap-4 text-sm">
-        <label class="inline-flex items-center gap-2"><input type="checkbox" name="aktif_mi" value="1" @checked($ayar['aktif_mi'] ?? true)> Online randevu açık</label>
+        <label class="inline-flex items-center gap-2"><input type="checkbox" name="aktif_mi" value="1" @checked($ayar['aktif_mi'] ?? true)> Randevu kabulü</label>
+        <label class="inline-flex items-center gap-2"><input type="checkbox" name="online_randevu_aktif" value="1" @checked($ayar['online_randevu_aktif'] ?? true)> Online randevu</label>
+        <label class="inline-flex items-center gap-2"><input type="checkbox" name="yuzyuze_randevu_aktif" value="1" @checked($ayar['yuzyuze_randevu_aktif'] ?? true)> Yüz yüze randevu</label>
         <label class="inline-flex items-center gap-2"><input type="checkbox" name="randevu_iptal_aktif_mi" value="1" @checked($ayar['randevu_iptal_aktif_mi'] ?? true)> Online iptal</label>
         <label class="inline-flex items-center gap-2"><input type="checkbox" name="email_bildirimleri" value="1" @checked($ayar['email_bildirimleri'] ?? true)> E-posta</label>
         <label class="inline-flex items-center gap-2"><input type="checkbox" name="sms_bildirimleri" value="1" @checked($ayar['sms_bildirimleri'] ?? true)> SMS</label>
