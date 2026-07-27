@@ -1,0 +1,152 @@
+/* Delogis tema override — panel vurgu rengi + küçük uyum */
+:root {
+  --delogis-base: var(--brand-500, #B9905D);
+  --delogis-base-rgb: 185, 144, 93;
+}
+
+.thm-btn,
+.main-menu-three__call-number a,
+.feature-two__title-box h3 a:hover,
+.site-footer a:hover {
+  /* marka rengi panelden gelir */
+}
+
+/* Randevu wizard / form alanları (iç sayfalar) */
+.dg-page {
+  padding: 60px 0 90px;
+}
+.dg-page .container {
+  max-width: 1200px;
+}
+.dg-card {
+  background: #fff;
+  border: 1px solid var(--delogis-bdr-color, #EBE2D8);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.dg-card h3 {
+  font-family: var(--delogis-font-two, Castoro, serif);
+  margin-bottom: 12px;
+}
+.dg-muted {
+  color: var(--delogis-gray, #8A969E);
+  line-height: 1.7;
+}
+.dg-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+@media (min-width: 992px) {
+  .dg-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.dg-photo {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.dg-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+.dg-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.dg-list li {
+  padding: 8px 0 8px 28px;
+  position: relative;
+  border-bottom: 1px solid var(--delogis-bdr-color, #EBE2D8);
+}
+.dg-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--delogis-base, #B9905D);
+  font-weight: 700;
+}
+.dg-svc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .dg-svc-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .dg-svc-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.dg-svc-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--delogis-bdr-color, #EBE2D8);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.dg-svc-card:hover {
+  box-shadow: 0 12px 40px rgba(41, 59, 70, .1);
+  transform: translateY(-2px);
+}
+.dg-svc-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.dg-svc-card .body {
+  padding: 18px;
+}
+.dg-svc-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 8px;
+  font-family: var(--delogis-font-two, Castoro, serif);
+}
+.dg-blog-grid {
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .dg-blog-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.dg-form label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+  color: var(--delogis-primary, #384E5C);
+}
+.dg-form input,
+.dg-form textarea,
+.dg-form select {
+  width: 100%;
+  border: 1px solid var(--delogis-bdr-color, #EBE2D8);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-family: inherit;
+}
+.dg-form button,
+.dg-form .thm-btn {
+  border: 0;
+  cursor: pointer;
+}
+/* Guest booking / mevcut randevu bileşenleri */
+.dg-page .guest-booking,
+.dg-page form {
+  max-width: 100%;
+}

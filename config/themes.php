@@ -72,5 +72,16 @@ return [
             'premium' => true,
             'layout' => 'ocean',
         ],
+        'delogis' => [
+            'ad' => 'Delogis Klinik',
+            'aciklama' => 'Delogis Home 3: slider hero, feature kartlar, premium klinik dili.',
+            'renk' => '#B9905D',
+            'font_sans' => 'Lexend',
+            'font_display' => 'Castoro',
+            'google_fonts' => 'Lexend:wght@300;400;500;600;700;800&family=Castoro:ital@0;1',
+            'preview' => ['#B9905D', '#F6F2ED', '#293B46'],
+            'premium' => true,
+            'layout' => 'delogis',
+        ],
     ],
 ];
