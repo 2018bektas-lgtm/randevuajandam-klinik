@@ -1,7 +1,7 @@
 @php
     $dg = rtrim(asset('themes/delogis'), '/');
     $footerNav = ! empty($doktor['menu']) && is_array($doktor['menu'])
-        ? collect($doktor['menu'])->filter(fn ($i) => ($i['key'] ?? '') !== 'anasayfa')->map(fn ($item) => [
+        ? collect($doktor['menu'])->filter(fn ($i) => empty($i['parent_id']) && ($i['key'] ?? '') !== 'anasayfa')->map(fn ($item) => [
             'href' => function_exists('nav_href') ? nav_href($item) : ($item['href'] ?? '#'),
             'label' => $item['label'] ?? '',
         ])->values()->all()
