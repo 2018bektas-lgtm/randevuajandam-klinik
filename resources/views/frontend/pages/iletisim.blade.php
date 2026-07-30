@@ -146,7 +146,10 @@
                     <div class="field full">
                         <label class="kvkk-label">
                             <input type="checkbox" name="kvkk_onay" id="kvkk_onay" value="1" required>
-                            <span>Kişisel verilerimin randevu oluşturma amacıyla işlenmesini kabul ediyorum. *</span>
+                            <span>
+                                Kişisel verilerimin randevu oluşturma amacıyla işlenmesini kabul ediyorum. *
+                                <a href="{{ route('frontend.legal.kvkk') }}" target="_blank" rel="noopener" style="text-decoration:underline">KVKK metni</a>
+                            </span>
                         </label>
                     </div>
                     <div class="full">

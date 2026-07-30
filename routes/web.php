@@ -33,6 +33,10 @@ Route::controller(SiteController::class)->group(function () {
     Route::get('/sss', 'sss')->name('frontend.sss');
     Route::get('/iletisim', 'iletisim')->name('frontend.iletisim');
     Route::get('/randevu', 'iletisim')->name('frontend.randevu');
+    // Klinik sitesi yasal metinleri (panel Site Ayarları → Yasal)
+    Route::get('/kvkk', 'yasalKvkk')->name('frontend.legal.kvkk');
+    Route::get('/gizlilik-politikasi', 'yasalGizlilik')->name('frontend.legal.gizlilik');
+    Route::get('/kullanim-kosullari', 'yasalKullanim')->name('frontend.legal.kullanim');
     Route::get('/sitemap.xml', 'sitemap')->name('frontend.sitemap');
 });
 
@@ -110,10 +114,12 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/seo', [SiteAyarlariController::class, 'kaydetSeo'])->name('seo.kaydet');
             Route::get('/iletisim', [SiteAyarlariController::class, 'iletisim'])->name('iletisim');
             Route::post('/iletisim', [SiteAyarlariController::class, 'kaydetIletisim'])->name('iletisim.kaydet');
+            Route::get('/yasal', [SiteAyarlariController::class, 'yasal'])->name('yasal');
+            Route::post('/yasal', [SiteAyarlariController::class, 'kaydetYasal'])->name('yasal.kaydet');
             Route::post('/reorder', [SiteAyarlariController::class, 'reorder'])->name('reorder');
             Route::post('/toggle', [SiteAyarlariController::class, 'toggle'])->name('toggle');
             Route::post('/{group}', [SiteAyarlariController::class, 'kaydet'])
-                ->where('group', 'genel|menu|slider|anasayfa|seo|iletisim')
+                ->where('group', 'genel|menu|slider|anasayfa|seo|iletisim|yasal')
                 ->name('kaydet');
         });
 

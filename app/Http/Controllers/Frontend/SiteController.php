@@ -4,17 +4,61 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Services\SiteContentService;
+use App\Services\SiteSettingsService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SiteController extends Controller
 {
-    public function __construct(protected SiteContentService $content) {}
+    public function __construct(
+        protected SiteContentService $content,
+        protected SiteSettingsService $settings
+    ) {}
 
     protected function doktor(): array
     {
         return $this->content->klinik();
+    }
+
+    public function yasalKvkk(): View
+    {
+        return $this->yasalSayfa(
+            'KVKK Aydınlatma Metni',
+            'yasal_kvkk',
+            'Bu sitede randevu ve iletişim formları aracılığıyla paylaştığınız kimlik ve iletişim verileri, randevu süreçlerinin yürütülmesi amacıyla işlenir. Veri sorumlusu bu web sitesinin sahibi kliniktir. Detaylı metin için klinik paneli → Site Ayarları → Yasal bölümünden metninizi kaydediniz.'
+        );
+    }
+
+    public function yasalGizlilik(): View
+    {
+        return $this->yasalSayfa(
+            'Gizlilik Politikası',
+            'yasal_gizlilik',
+            'Bu web sitesinde toplanan bilgiler randevu ve iletişim amaçlarıyla kullanılır; üçüncü taraflara satılmaz. Çerez ve teknik loglar site güvenliği için tutulabilir. Güncel politika için klinik paneli → Site Ayarları → Yasal bölümünden metninizi kaydediniz.'
+        );
+    }
+
+    public function yasalKullanim(): View
+    {
+        return $this->yasalSayfa(
+            'Kullanım Koşulları',
+            'yasal_kullanim',
+            'Bu web sitesi bilgilendirme ve randevu talebi amaçlıdır. Tıbbi acil durumlar için 112 arayınız. Site içeriği bilgilendirme niteliğindedir. Güncel koşullar için klinik paneli → Site Ayarları → Yasal bölümünden metninizi kaydediniz.'
+        );
+    }
+
+    protected function yasalSayfa(string $baslik, string $optionKey, string $varsayilan): View
+    {
+        $doktor = $this->doktor();
+        $raw = trim((string) $this->settings->option($optionKey, ''));
+        $icerik = $raw !== '' ? $raw : $varsayilan;
+
+        return $this->themePage('yasal', [
+            'doktor' => $doktor,
+            'baslik' => $baslik,
+            'icerik' => $icerik,
+        ]);
     }
 
     /**

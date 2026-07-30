@@ -123,6 +123,44 @@ class SiteAyarlariController extends Controller
         ]);
     }
 
+    /**
+     * Klinik sitesinin kendi KVKK / gizlilik / kullanım metinleri.
+     * Platform (randevuajandam.com) yasal metinleri SaaS içindir; burası vitrin ziyaretçileri için.
+     */
+    public function yasal()
+    {
+        return view('panel.site-ayarlari.yasal', [
+            'group' => 'yasal',
+            'ayarlar' => [
+                'kvkk' => $this->settings->option('yasal_kvkk', ''),
+                'gizlilik' => $this->settings->option('yasal_gizlilik', ''),
+                'kullanim' => $this->settings->option('yasal_kullanim', ''),
+            ],
+            'publicUrls' => [
+                'kvkk' => route('frontend.legal.kvkk'),
+                'gizlilik' => route('frontend.legal.gizlilik'),
+                'kullanim' => route('frontend.legal.kullanim'),
+            ],
+        ]);
+    }
+
+    public function kaydetYasal(Request $request)
+    {
+        $request->validate([
+            'kvkk' => ['nullable', 'string', 'max:50000'],
+            'gizlilik' => ['nullable', 'string', 'max:50000'],
+            'kullanim' => ['nullable', 'string', 'max:50000'],
+        ]);
+
+        $this->settings->setOptions([
+            'yasal_kvkk' => $request->input('kvkk', ''),
+            'yasal_gizlilik' => $request->input('gizlilik', ''),
+            'yasal_kullanim' => $request->input('kullanim', ''),
+        ]);
+
+        return back()->with('basari', 'Yasal metinler kaydedildi. Public sitede footer ve randevu formu bu metinlere bağlanır.');
+    }
+
     public function temalar()
     {
         $aktif = (string) $this->settings->option('tema_id', (string) config('themes.default', 'klasik'));
@@ -269,6 +307,7 @@ class SiteAyarlariController extends Controller
 
         return back()->with('basari', 'İletişim sayfası ayarları kaydedildi.');
     }
+
 
     public function menuKaydet(Request $request)
     {
