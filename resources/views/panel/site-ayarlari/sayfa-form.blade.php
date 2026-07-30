@@ -1,7 +1,7 @@
-@extends('panel.layouts.app')
+﻿@extends('panel.layouts.app')
 @php $edit = $page !== null; @endphp
-@section('baslik', $edit ? 'Sayfa düzenle' : 'Yeni sayfa')
-@section('sayfa_baslik', $edit ? 'Sayfa düzenle' : 'Yeni sayfa')
+@section('baslik', $edit ? 'Sayfa dÃ¼zenle' : 'Yeni sayfa')
+@section('sayfa_baslik', $edit ? 'Sayfa dÃ¼zenle' : 'Yeni sayfa')
 
 @section('icerik')
 @include('panel.site-ayarlari._shell')
@@ -11,7 +11,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"></path>
         </svg>
-        Sayfa listesine dön
+        Sayfa listesine dÃ¶n
     </a>
 </div>
 
@@ -25,10 +25,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="md:col-span-2 space-y-6">
                 <div class="space-y-1.5">
-                    <label for="baslik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Sayfa başlığı</label>
+                    <label for="baslik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Sayfa baÅŸlÄ±ÄŸÄ±</label>
                     <input type="text" name="baslik" id="baslik" required
                            value="{{ old('baslik', $page->baslik ?? '') }}"
-                           placeholder="Örn: KVKK Aydınlatma Metni"
+                           placeholder="Ã–rn: KVKK AydÄ±nlatma Metni"
                            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#111827] focus:outline-none focus:border-[#C96A2B] focus:ring-1 focus:ring-[#C96A2B] text-xs transition-all">
                 </div>
 
@@ -38,13 +38,13 @@
                         <span class="text-[11px] text-slate-400 font-mono shrink-0">/sayfa/</span>
                         <input type="text" name="slug" id="slug"
                                value="{{ old('slug', $page->slug ?? '') }}"
-                               placeholder="kvkk-aydinlatma (boş = başlıktan)"
+                               placeholder="kvkk-aydinlatma (boÅŸ = baÅŸlÄ±ktan)"
                                class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#111827] focus:outline-none focus:border-[#C96A2B] focus:ring-1 focus:ring-[#C96A2B] text-xs font-mono transition-all">
                     </div>
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="icerik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Sayfa içeriği</label>
+                    <label for="icerik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Sayfa iÃ§eriÄŸi</label>
                     <textarea name="icerik" id="icerik" rows="14"
                               class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#111827] text-xs">{{ old('icerik', $page->icerik ?? '') }}</textarea>
                 </div>
@@ -53,8 +53,8 @@
             <div class="space-y-6">
                 <div class="space-y-1.5 flex items-center justify-between p-4.5 rounded-xl bg-slate-50 border border-slate-100">
                     <div class="max-w-[150px]">
-                        <label class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Yayında</label>
-                        <span class="text-[9px] text-[#6B7280]">Public sitede görünsün mü?</span>
+                        <label class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">YayÄ±nda</label>
+                        <span class="text-[9px] text-[#6B7280]">Public sitede gÃ¶rÃ¼nsÃ¼n mÃ¼?</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer select-none">
                         <input type="checkbox" name="aktif" id="aktif" value="1" class="sr-only peer"
@@ -65,8 +65,8 @@
 
                 <div class="space-y-1.5 flex items-center justify-between p-4.5 rounded-xl bg-slate-50 border border-slate-100">
                     <div class="max-w-[150px]">
-                        <label class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Footer’da göster</label>
-                        <span class="text-[9px] text-[#6B7280]">Site altında link</span>
+                        <label class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Footerâ€™da gÃ¶ster</label>
+                        <span class="text-[9px] text-[#6B7280]">Site altÄ±nda link</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer select-none">
                         <input type="checkbox" name="footer_goster" id="footer_goster" value="1" class="sr-only peer"
@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="sira" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Footer sırası</label>
+                    <label for="sira" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Footer sÄ±rasÄ±</label>
                     <input type="number" name="sira" id="sira" min="0" max="9999"
                            value="{{ old('sira', $page->sira ?? 0) }}"
                            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs">
@@ -84,24 +84,24 @@
 
                 <div class="bg-slate-50/50 rounded-2xl border border-[#E5E7EB] p-5 space-y-4">
                     <div class="flex items-center gap-2 border-b border-[#E5E7EB] pb-3">
-                        <svg class="w-4.5 h-4.5 text-[#C96A2B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 shrink-0 text-[#C96A2B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-xs font-bold font-display text-[#111827] uppercase tracking-wider">SEO Ayarları</span>
+                        <span class="text-xs font-bold font-display text-[#111827] uppercase tracking-wider">SEO AyarlarÄ±</span>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label for="meta_baslik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Meta Başlık (Title)</label>
+                        <label for="meta_baslik" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Meta BaÅŸlÄ±k (Title)</label>
                         <input type="text" name="meta_baslik" id="meta_baslik" maxlength="255"
                                value="{{ old('meta_baslik', $page->meta_baslik ?? '') }}"
-                               placeholder="Arama motoru başlığı (boş = sayfa başlığı)"
+                               placeholder="Arama motoru baÅŸlÄ±ÄŸÄ± (boÅŸ = sayfa baÅŸlÄ±ÄŸÄ±)"
                                class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#111827] focus:outline-none focus:border-[#C96A2B] focus:ring-1 focus:ring-[#C96A2B] text-xs transition-all">
                     </div>
 
                     <div class="space-y-1.5">
-                        <label for="meta_aciklama" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Meta Açıklama (Description)</label>
+                        <label for="meta_aciklama" class="block text-[10px] font-bold text-[#1F2937] uppercase tracking-wider font-display">Meta AÃ§Ä±klama (Description)</label>
                         <textarea name="meta_aciklama" id="meta_aciklama" rows="3" maxlength="500"
-                                  placeholder="Arama sonucu özeti (≈160 karakter)"
+                                  placeholder="Arama sonucu Ã¶zeti (â‰ˆ160 karakter)"
                                   class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#111827] focus:outline-none focus:border-[#C96A2B] focus:ring-1 focus:ring-[#C96A2B] text-xs transition-all resize-none">{{ old('meta_aciklama', $page->meta_aciklama ?? '') }}</textarea>
                     </div>
 
@@ -114,14 +114,14 @@
                             <input type="text" id="tagInput" placeholder="Kelime ekleyin..."
                                    class="flex-grow bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none outline-none text-xs py-0.5 placeholder-gray-400 min-w-[120px]">
                         </div>
-                        <span class="text-[9px] text-gray-400">Enter veya virgül ile ekleyin.</span>
+                        <span class="text-[9px] text-gray-400">Enter veya virgÃ¼l ile ekleyin.</span>
                     </div>
                 </div>
 
                 <p class="text-[10px] text-slate-500 leading-relaxed">
-                    Menüye eklemek için kaydettikten sonra
-                    <a href="{{ route('panel.site-ayarlari.menu') }}" class="font-bold text-[#C96A2B] underline">Menü</a>
-                    sayfasından <strong>Sayfa: …</strong> seçin.
+                    MenÃ¼ye eklemek iÃ§in kaydettikten sonra
+                    <a href="{{ route('panel.site-ayarlari.menu') }}" class="font-bold text-[#C96A2B] underline">MenÃ¼</a>
+                    sayfasÄ±ndan <strong>Sayfa: â€¦</strong> seÃ§in.
                 </p>
             </div>
         </div>
@@ -129,11 +129,11 @@
         <div class="flex justify-end gap-3.5 pt-4 border-t border-[#E5E7EB]">
             <a href="{{ route('panel.site-ayarlari.sayfalar') }}"
                class="px-6 py-3 rounded-xl border border-[#E5E7EB] text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors font-display">
-                İptal
+                Ä°ptal
             </a>
             <button type="submit"
                     class="px-8 py-3 rounded-xl bg-[#C96A2B] hover:bg-[#B55A20] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer font-display">
-                {{ $edit ? 'Güncelle' : 'Kaydet' }}
+                {{ $edit ? 'GÃ¼ncelle' : 'Kaydet' }}
             </button>
         </div>
     </form>
