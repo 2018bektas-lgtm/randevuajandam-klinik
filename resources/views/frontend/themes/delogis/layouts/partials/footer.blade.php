@@ -145,6 +145,14 @@
                         <p class="site-footer__bottom-text">
                             © {{ date('Y') }} <a href="{{ route('frontend.anasayfa') }}">{{ $adSoyad }}</a>
                             · Randevu Ajandam
+                            <br>
+                            <a href="https://randevuajandam.com/kvkk" target="_blank" rel="noopener">KVKK</a>
+                            ·
+                            <a href="https://randevuajandam.com/gizlilik-politikasi" target="_blank" rel="noopener">Gizlilik</a>
+                            ·
+                            <a href="https://randevuajandam.com/kullanim-kosullari" target="_blank" rel="noopener">Kullanım</a>
+                            ·
+                            <a href="https://randevuajandam.com/mesafeli-satis-sozlesmesi" target="_blank" rel="noopener">Mesafeli satış</a>
                         </p>
                     </div>
                 </div>
