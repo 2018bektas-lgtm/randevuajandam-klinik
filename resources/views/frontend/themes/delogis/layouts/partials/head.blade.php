@@ -38,8 +38,12 @@
 @include('frontend.layouts.partials.recaptcha')
 <title>{{ $pageTitle }}</title>
 <meta name="description" content="{{ $pageDesc }}">
-@if($seoKw !== '')
-<meta name="keywords" content="{{ $seoKw }}">
+@php
+    $pageKwYield = trim($decodeEntities($__env->yieldContent('meta_anahtar')));
+    $keywordsOut = $pageKwYield !== '' ? $pageKwYield : $seoKw;
+@endphp
+@if($keywordsOut !== '')
+<meta name="keywords" content="{{ $keywordsOut }}">
 @endif
 <meta name="theme-color" content="{{ $theme }}">
 <link rel="canonical" href="{{ $canonical }}">

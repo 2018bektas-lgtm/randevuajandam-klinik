@@ -160,7 +160,10 @@ class SiteAyarlariController extends Controller
         $data = $request->validate([
             'baslik' => ['required', 'string', 'max:200'],
             'slug' => ['nullable', 'string', 'max:200'],
-            'icerik' => ['nullable', 'string', 'max:100000'],
+            'icerik' => ['nullable', 'string', 'max:200000'],
+            'meta_baslik' => ['nullable', 'string', 'max:255'],
+            'meta_aciklama' => ['nullable', 'string', 'max:500'],
+            'meta_anahtar_kelimeler' => ['nullable', 'string', 'max:500'],
             'aktif' => ['nullable'],
             'footer_goster' => ['nullable'],
             'sira' => ['nullable', 'integer', 'min:0', 'max:9999'],
@@ -173,13 +176,22 @@ class SiteAyarlariController extends Controller
         if ($slug === '') {
             $slug = SitePage::makeSlug($data['baslik'], $id);
         }
-        // Unique slug
         $slug = SitePage::makeSlug($slug, $id);
+
+        $icerik = (string) ($data['icerik'] ?? '');
+        try {
+            $icerik = app(\App\Services\HtmlSanitizer::class)->clean($icerik);
+        } catch (\Throwable) {
+            // sanitizer yoksa ham HTML (CKEditor çıktısı)
+        }
 
         $payload = [
             'baslik' => $data['baslik'],
             'slug' => $slug,
-            'icerik' => $data['icerik'] ?? '',
+            'icerik' => $icerik,
+            'meta_baslik' => $data['meta_baslik'] ?? null,
+            'meta_aciklama' => $data['meta_aciklama'] ?? null,
+            'meta_anahtar_kelimeler' => $data['meta_anahtar_kelimeler'] ?? null,
             'aktif' => $request->boolean('aktif', true),
             'footer_goster' => $request->boolean('footer_goster'),
             'sira' => (int) ($data['sira'] ?? 0),
