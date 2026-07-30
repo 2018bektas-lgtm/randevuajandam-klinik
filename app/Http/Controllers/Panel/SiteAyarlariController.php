@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Models\SiteFooterItem;
 use App\Models\SiteHomepageSection;
 use App\Models\SiteMenuItem;
 use App\Models\SitePage;
@@ -158,6 +159,100 @@ class SiteAyarlariController extends Controller
             'group' => 'sayfalar',
             'pages' => SitePage::query()->orderBy('sira')->orderBy('id')->get(),
         ]);
+    }
+
+    public function footer()
+    {
+        return view('panel.site-ayarlari.footer', [
+            'group' => 'footer',
+            'items' => $this->settings->footerItems(),
+            'pageOptions' => $this->internalPageOptions(),
+            'pageGroups' => $this->internalPageGroups(),
+        ]);
+    }
+
+    public function footerKaydet(Request $request)
+    {
+        $ids = $request->input('id', []);
+        $labels = $request->input('label', []);
+        $urls = $request->input('url', []);
+        $routes = $request->input('route', []);
+        $linkTypes = $request->input('link_type', []);
+        $aktif = $request->input('aktif', []);
+        $allowedRoutes = array_keys($this->internalPageOptions());
+
+        foreach ($ids as $i => $id) {
+            $id = (int) $id;
+            if ($id < 1 || ! SiteFooterItem::query()->where('id', $id)->exists()) {
+                continue;
+            }
+
+            $type = (string) ($linkTypes[$i] ?? 'route');
+            if (! in_array($type, ['route', 'url'], true)) {
+                $type = 'route';
+            }
+
+            $route = (string) ($routes[$i] ?? 'frontend.anasayfa');
+            if (! in_array($route, $allowedRoutes, true)) {
+                $route = 'frontend.anasayfa';
+            }
+
+            $url = null;
+            if ($type === 'url') {
+                $url = trim((string) ($urls[$i] ?? ''));
+                if ($url !== '' && ! str_starts_with($url, 'http') && ! str_starts_with($url, '/') && ! str_starts_with($url, 'mailto:') && ! str_starts_with($url, 'tel:')) {
+                    $url = 'https://'.$url;
+                }
+                if ($url === '') {
+                    $url = null;
+                    $type = 'route';
+                }
+            }
+
+            $label = trim((string) ($labels[$i] ?? ''));
+            if ($label === '' && $type === 'route') {
+                $label = $this->internalPageOptions()[$route] ?? $route;
+            }
+            if ($label === '') {
+                $label = 'Footer linki';
+            }
+
+            SiteFooterItem::query()->where('id', $id)->update([
+                'label' => $label,
+                'route' => $route,
+                'url' => $type === 'url' ? $url : null,
+                'aktif' => ! empty($aktif[$i]),
+                'sira' => $i + 1,
+            ]);
+        }
+
+        $this->settings->forgetCache();
+
+        return back()->with('basari', 'Footer linkleri kaydedildi.');
+    }
+
+    public function footerEkle()
+    {
+        $max = (int) SiteFooterItem::query()->max('sira');
+        SiteFooterItem::query()->create([
+            'key' => 'ozel_'.substr(uniqid(), -6),
+            'label' => 'Yeni footer linki',
+            'route' => 'frontend.anasayfa',
+            'url' => null,
+            'aktif' => true,
+            'sira' => $max + 1,
+        ]);
+        $this->settings->forgetCache();
+
+        return back()->with('basari', 'Footer linki eklendi.');
+    }
+
+    public function footerSil(int $id)
+    {
+        SiteFooterItem::query()->where('id', $id)->delete();
+        $this->settings->forgetCache();
+
+        return back()->with('basari', 'Footer linki silindi.');
     }
 
     public function sayfaOlustur()
@@ -908,7 +1003,7 @@ class SiteAyarlariController extends Controller
     public function reorder(Request $request)
     {
         $data = $request->validate([
-            'type' => ['required', 'in:menu,slider,anasayfa'],
+            'type' => ['required', 'in:menu,slider,anasayfa,footer'],
             'ids' => ['required', 'array', 'min:1'],
             'ids.*' => ['integer'],
         ]);
@@ -921,7 +1016,7 @@ class SiteAyarlariController extends Controller
     public function toggle(Request $request)
     {
         $data = $request->validate([
-            'type' => ['required', 'in:menu,slider,anasayfa'],
+            'type' => ['required', 'in:menu,slider,anasayfa,footer'],
             'id' => ['required', 'integer'],
             'aktif' => ['required', 'boolean'],
         ]);
@@ -930,6 +1025,7 @@ class SiteAyarlariController extends Controller
             'menu' => SiteMenuItem::class,
             'slider' => SiteSliderSlide::class,
             'anasayfa' => SiteHomepageSection::class,
+            'footer' => SiteFooterItem::class,
         };
 
         $model::query()->where('id', $data['id'])->update(['aktif' => $data['aktif']]);
@@ -946,6 +1042,7 @@ class SiteAyarlariController extends Controller
             'seo' => $this->kaydetSeo($request),
             'iletisim' => $this->kaydetIletisim($request),
             'menu' => $this->menuKaydet($request),
+            'footer' => $this->footerKaydet($request),
             'anasayfa' => $this->anasayfaKaydet($request),
             default => back()->with('hata', 'Bilinmeyen grup'),
         };

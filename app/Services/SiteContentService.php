@@ -285,6 +285,7 @@ class SiteContentService
 
         $genel = $settings['genel'] ?? [];
         $menu = $settings['menu'] ?? [];
+        $footer = $settings['footer'] ?? [];
         $slider = $settings['slider'] ?? [];
         $anasayfa = $settings['anasayfa'] ?? [];
         $seo = $settings['seo'] ?? [];
@@ -323,6 +324,14 @@ class SiteContentService
 
         if (! empty($menu['items']) && is_array($menu['items'])) {
             $out['menu'] = collect($menu['items'])
+                ->filter(fn ($i) => ! empty($i['aktif']))
+                ->sortBy('sira')
+                ->values()
+                ->all();
+        }
+
+        if (! empty($footer['items']) && is_array($footer['items'])) {
+            $out['footer_menu'] = collect($footer['items'])
                 ->filter(fn ($i) => ! empty($i['aktif']))
                 ->sortBy('sira')
                 ->values()

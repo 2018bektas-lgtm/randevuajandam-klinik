@@ -1,15 +1,7 @@
 @php
-    $footerNav = ! empty($doktor['menu']) && is_array($doktor['menu'])
-        ? collect($doktor['menu'])->filter(fn ($i) => empty($i['parent_id']) && ($i['key'] ?? '') !== 'anasayfa')->map(fn ($item) => [
-            'href' => nav_href($item),
-            'label' => $item['label'] ?? '',
-        ])->values()->all()
-        : [
-            ['href' => route('frontend.hakkimda'), 'label' => 'Hakkımda'],
-            ['href' => route('frontend.hizmetler'), 'label' => 'Hizmetler'],
-            ['href' => route('frontend.blog'), 'label' => 'Blog'],
-            ['href' => route('frontend.iletisim'), 'label' => 'İletişim'],
-        ];
+    $footerNav = function_exists('site_footer_nav')
+        ? site_footer_nav($doktor ?? null)
+        : [];
 @endphp
 <footer class="th-modern-footer">
     <div class="container th-modern-footer-grid">

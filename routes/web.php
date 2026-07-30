@@ -102,6 +102,10 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/menu', [SiteAyarlariController::class, 'menuKaydet'])->name('menu.kaydet');
             Route::post('/menu/ekle', [SiteAyarlariController::class, 'menuEkle'])->name('menu.ekle');
             Route::post('/menu/{id}/sil', [SiteAyarlariController::class, 'menuSil'])->whereNumber('id')->name('menu.sil');
+            Route::get('/footer', [SiteAyarlariController::class, 'footer'])->name('footer');
+            Route::post('/footer', [SiteAyarlariController::class, 'footerKaydet'])->name('footer.kaydet');
+            Route::post('/footer/ekle', [SiteAyarlariController::class, 'footerEkle'])->name('footer.ekle');
+            Route::post('/footer/{id}/sil', [SiteAyarlariController::class, 'footerSil'])->whereNumber('id')->name('footer.sil');
             Route::get('/slider', [SiteAyarlariController::class, 'slider'])->name('slider');
             Route::post('/slider', [SiteAyarlariController::class, 'sliderStore'])->name('slider.store');
             Route::put('/slider/{id}', [SiteAyarlariController::class, 'sliderUpdate'])->name('slider.update');
@@ -124,7 +128,7 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/reorder', [SiteAyarlariController::class, 'reorder'])->name('reorder');
             Route::post('/toggle', [SiteAyarlariController::class, 'toggle'])->name('toggle');
             Route::post('/{group}', [SiteAyarlariController::class, 'kaydet'])
-                ->where('group', 'genel|menu|slider|anasayfa|seo|iletisim|sayfalar')
+                ->where('group', 'genel|menu|footer|slider|anasayfa|seo|iletisim|sayfalar')
                 ->name('kaydet');
         });
 

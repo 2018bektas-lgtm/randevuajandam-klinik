@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SiteHomepageSection;
+use App\Models\SiteFooterItem;
 use App\Models\SiteMenuItem;
 use App\Models\SiteOption;
 use App\Models\SiteSliderSlide;
@@ -17,7 +18,7 @@ class SiteSettingsService
     public function forgetCache(): void
     {
         Cache::forget('kliniksitesi.site_settings.v2');
-        Cache::forget('doktorsitesi.site_settings.v2'); // eski key temizliği
+        Cache::forget('kliniksitesi.site_settings.v3');
         try {
             app(SiteContentService::class)->forgetCache();
         } catch (\Throwable) {
@@ -108,6 +109,11 @@ class SiteSettingsService
         return SiteMenuItem::query()->orderBy('sira')->orderBy('id')->get();
     }
 
+    public function footerItems()
+    {
+        return SiteFooterItem::query()->orderBy('sira')->orderBy('id')->get();
+    }
+
     public function sliderSlides()
     {
         return SiteSliderSlide::query()->orderBy('sira')->orderBy('id')->get();
@@ -122,6 +128,7 @@ class SiteSettingsService
     {
         $model = match ($type) {
             'menu' => SiteMenuItem::class,
+            'footer' => SiteFooterItem::class,
             'slider' => SiteSliderSlide::class,
             'anasayfa' => SiteHomepageSection::class,
             default => throw new \InvalidArgumentException('Geçersiz tip'),
@@ -140,7 +147,7 @@ class SiteSettingsService
      */
     public function frontendBundle(): array
     {
-        return Cache::remember('kliniksitesi.site_settings.v2', 60, function () {
+        return Cache::remember('kliniksitesi.site_settings.v3', 60, function () {
             return [
                 'genel' => [
                     'site_baslik_ek' => $this->option('site_baslik_ek', ''),
@@ -160,6 +167,17 @@ class SiteSettingsService
                     'items' => $this->menuItems()->map(fn ($m) => [
                         'id' => $m->id,
                         'parent_id' => $m->parent_id ? (int) $m->parent_id : null,
+                        'key' => $m->key,
+                        'label' => $m->label,
+                        'route' => $m->route,
+                        'url' => $m->url,
+                        'aktif' => (bool) $m->aktif,
+                        'sira' => (int) $m->sira,
+                    ])->all(),
+                ],
+                'footer' => [
+                    'items' => $this->footerItems()->map(fn ($m) => [
+                        'id' => $m->id,
                         'key' => $m->key,
                         'label' => $m->label,
                         'route' => $m->route,

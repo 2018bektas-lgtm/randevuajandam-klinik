@@ -15,8 +15,14 @@
         'menu' => [
             'route' => 'panel.site-ayarlari.menu',
             'label' => 'Menü',
-            'desc' => 'Sürükle sırala',
+            'desc' => 'Header menü',
             'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10"/></svg>',
+        ],
+        'footer' => [
+            'route' => 'panel.site-ayarlari.footer',
+            'label' => 'Footer',
+            'desc' => 'Alt linkler',
+            'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>',
         ],
         'slider' => [
             'route' => 'panel.site-ayarlari.slider',
@@ -70,7 +76,7 @@
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
-        <div class="p-3 sm:p-3.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-2">
+        <div class="p-3 sm:p-3.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-9 gap-2">
             @foreach($tabs as $key => $tab)
                 @php $active = ($group ?? '') === $key; @endphp
                 <a href="{{ route($tab['route']) }}"
