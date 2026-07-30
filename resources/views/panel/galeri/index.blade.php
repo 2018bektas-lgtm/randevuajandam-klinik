@@ -1,12 +1,12 @@
 @extends('panel.layouts.app')
 
-@section('baslik', 'FotoÄŸraf Galerisi - Hekim Paneli')
-@section('sayfa_baslik', 'FotoÄŸraf Galerisi')
+@section('baslik', 'Fotoğraf Galerisi - Hekim Paneli')
+@section('sayfa_baslik', 'Fotoğraf Galerisi')
 
 @section('icerik')
 <div class="mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4">
     <p class="text-sm text-[#6B7280]">
-        KliniÄŸinize, muayenehanenize veya tedavi sÃ¼reÃ§lerinize ait fotoÄŸraflarÄ± buradan yÃ¼kleyebilir, baÅŸlÄ±klarÄ±nÄ± dÃ¼zenleyebilir ve sÃ¼rÃ¼kle-bÄ±rak yÃ¶ntemiyle sÄ±ralayabilirsiniz.
+        Kliniğinize, muayenehanenize veya tedavi süreçlerinize ait fotoğrafları buradan yükleyebilir, başlıklarını düzenleyebilir ve sürükle-bırak yöntemiyle sıralayabilirsiniz.
     </p>
 </div>
 
@@ -34,7 +34,7 @@
             <svg class="w-5 h-5 text-[#C96A2B]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            Yeni FotoÄŸraflar Ekle
+            Yeni Fotoğraflar Ekle
         </h3>
         
         <form action="{{ route('panel.galeri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -49,22 +49,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"></path>
                         </svg>
                     </div>
-                    <div class="text-xs font-bold text-[#111827] font-display">TÄ±klayÄ±n veya DosyalarÄ± SÃ¼rÃ¼kleyin</div>
-                    <p class="text-[10px] text-[#9CA3AF] font-sans">En fazla 5MB boyutunda JPEG, PNG, JPG, WEBP formatlarÄ±</p>
+                    <div class="text-xs font-bold text-[#111827] font-display">Tıklayın veya Dosyaları Sürükleyin</div>
+                    <p class="text-[10px] text-[#9CA3AF] font-sans">En fazla 5MB boyutunda JPEG, PNG, JPG, WEBP formatları</p>
                 </div>
             </div>
             
             <!-- Upload Queue / Previews Container -->
             <div id="previewContainer" class="space-y-3 hidden">
                 <div class="flex justify-between items-center pb-2 border-b border-[#E5E7EB]">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] font-display">SeÃ§ilen Dosyalar</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] font-display">Seçilen Dosyalar</span>
                     <button type="button" id="clearFiles" class="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wide transition-colors">Temizle</button>
                 </div>
                 <div id="previewList" class="space-y-3 max-h-[250px] overflow-y-auto pr-1"></div>
             </div>
             
             <button type="submit" id="uploadBtn" disabled class="w-full py-3 bg-[#1F2937] hover:bg-[#111827] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 font-display shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                FotoÄŸraflarÄ± YÃ¼kle
+                Fotoğrafları Yükle
             </button>
         </form>
     </div>
@@ -72,10 +72,10 @@
     <!-- Right: Gallery Grid -->
     <div class="lg:col-span-2 bg-white border border-[#E5E7EB] rounded-3xl p-6 shadow-[0_8px_30px_rgba(31,41,55,0.02)]">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-base font-bold font-display text-[#111827]">FotoÄŸraflarÄ±m ({{ $galeriler->count() }})</h3>
+            <h3 class="text-base font-bold font-display text-[#111827]">Fotoğraflarım ({{ $galeriler->count() }})</h3>
             <span class="text-[10px] font-semibold bg-[#FFF7ED] text-[#C96A2B] px-2.5 py-1 rounded-full border border-[#E7B58A]/30 flex items-center gap-1 font-display">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#C96A2B] animate-pulse"></span>
-                SÃ¼rÃ¼kleyip SÄ±ralayabilirsiniz
+                Sürükleyip Sıralayabilirsiniz
             </span>
         </div>
         
@@ -86,9 +86,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"></path>
                     </svg>
                 </div>
-                <h3 class="text-base font-bold font-display text-[#111827]">Galeriniz HenÃ¼z BoÅŸ</h3>
+                <h3 class="text-base font-bold font-display text-[#111827]">Galeriniz Henüz Boş</h3>
                 <p class="text-xs text-[#6B7280] mt-1.5 max-w-sm mx-auto">
-                    Muayenehane odalarÄ±nÄ±z, giriÅŸ salonu veya kullandÄ±ÄŸÄ±nÄ±z tÄ±bbi ekipman fotoÄŸraflarÄ±nÄ± yÃ¼kleyerek hastalarÄ±nÄ±za gÃ¼ven verin.
+                    Muayenehane odalarınız, giriş salonu veya kullandığınız tıbbi ekipman fotoğraflarını yükleyerek hastalarınıza güven verin.
                 </p>
             </div>
         @else
@@ -102,14 +102,14 @@
                             <!-- Premium Overlay Actions -->
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
                                 <!-- Edit Title Button -->
-                                <button onclick="editModal('{{ $galeri->id }}', '{{ addslashes($galeri->baslik) }}')" class="p-2 bg-white rounded-lg text-gray-700 hover:text-[#C96A2B] shadow-sm transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 cursor-pointer" title="DÃ¼zenle">
+                                <button onclick="editModal('{{ $galeri->id }}', '{{ addslashes($galeri->baslik) }}')" class="p-2 bg-white rounded-lg text-gray-700 hover:text-[#C96A2B] shadow-sm transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 cursor-pointer" title="Düzenle">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
                                     </svg>
                                 </button>
                                 
                                 <!-- Delete Button -->
-                                <form action="{{ route('panel.galeri.destroy', $galeri->id) }}" method="POST" class="inline" onsubmit="return confirm('Bu fotoÄŸrafÄ± silmek istediÄŸinize emin misiniz?')">
+                                <form action="{{ route('panel.galeri.destroy', $galeri->id) }}" method="POST" class="inline" onsubmit="return confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 bg-white rounded-lg text-gray-700 hover:text-red-600 shadow-sm transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 cursor-pointer" title="Sil">
@@ -122,14 +122,14 @@
                             
                             <!-- Order Number Badge -->
                             <div class="absolute top-3 left-3 bg-[#111827]/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-lg text-[9px] font-bold font-display select-none">
-                                SÄ±ra: <span class="order-badge">{{ $galeri->sira }}</span>
+                                Sıra: <span class="order-badge">{{ $galeri->sira }}</span>
                             </div>
                         </div>
                         
                         <!-- Details Area -->
                         <div class="p-3 border-t border-[#E5E7EB]">
-                            <p class="text-xs font-bold text-[#111827] truncate font-display" title="{{ $galeri->baslik ?? 'BaÅŸlÄ±ksÄ±z GÃ¶rsel' }}">
-                                {{ $galeri->baslik ?? 'BaÅŸlÄ±ksÄ±z GÃ¶rsel' }}
+                            <p class="text-xs font-bold text-[#111827] truncate font-display" title="{{ $galeri->baslik ?? 'Başlıksız Görsel' }}">
+                                {{ $galeri->baslik ?? 'Başlıksız Görsel' }}
                             </p>
                         </div>
                     </div>
@@ -144,7 +144,7 @@
     <div id="editModalContainer" class="bg-white rounded-3xl border border-[#E5E7EB] shadow-2xl max-w-md w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
         <!-- Modal Header -->
         <div class="px-6 py-5 border-b border-[#E5E7EB] flex justify-between items-center bg-[#FAFAFA]">
-            <h3 class="text-sm font-bold font-display text-[#111827] uppercase tracking-wider">FotoÄŸrafÄ± DÃ¼zenle</h3>
+            <h3 class="text-sm font-bold font-display text-[#111827] uppercase tracking-wider">Fotoğrafı Düzenle</h3>
             <button onclick="closeEditModal()" class="text-[#6B7280] hover:text-[#111827] cursor-pointer">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
@@ -157,15 +157,15 @@
             <div class="p-6 space-y-4 text-left">
                 <!-- Title input -->
                 <div class="space-y-1.5">
-                    <label for="edit_baslik" class="text-xs font-bold text-[#4B5563] uppercase tracking-wider font-display">AÃ§Ä±klama / BaÅŸlÄ±k</label>
-                    <input type="text" name="baslik" id="edit_baslik" class="w-full px-4 py-3 border border-[#E5E7EB] rounded-xl text-xs font-medium focus:ring-1 focus:ring-[#C96A2B] focus:border-[#C96A2B] bg-[#FAFAFA] font-sans outline-none transition-colors" placeholder="FotoÄŸraf iÃ§in kÄ±sa bir aÃ§Ä±klama yazÄ±n">
+                    <label for="edit_baslik" class="text-xs font-bold text-[#4B5563] uppercase tracking-wider font-display">Açıklama / Başlık</label>
+                    <input type="text" name="baslik" id="edit_baslik" class="w-full px-4 py-3 border border-[#E5E7EB] rounded-xl text-xs font-medium focus:ring-1 focus:ring-[#C96A2B] focus:border-[#C96A2B] bg-[#FAFAFA] font-sans outline-none transition-colors" placeholder="Fotoğraf için kısa bir açıklama yazın">
                 </div>
             </div>
             
             <!-- Modal Footer -->
             <div class="px-6 py-4 bg-slate-50 border-t border-[#E5E7EB] flex justify-end gap-3">
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-[#E5E7EB] rounded-xl text-xs font-bold text-gray-700 transition-colors font-display cursor-pointer">VazgeÃ§</button>
-                <button type="submit" class="px-4 py-2 bg-[#C96A2B] hover:bg-[#B55A20] rounded-xl text-xs font-bold text-white transition-colors font-display shadow-sm cursor-pointer">GÃ¼ncelle</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-[#E5E7EB] rounded-xl text-xs font-bold text-gray-700 transition-colors font-display cursor-pointer">Vazgeç</button>
+                <button type="submit" class="px-4 py-2 bg-[#C96A2B] hover:bg-[#B55A20] rounded-xl text-xs font-bold text-white transition-colors font-display shadow-sm cursor-pointer">Güncelle</button>
             </div>
         </form>
     </div>
@@ -205,7 +205,7 @@
                             </div>
                             <div class="flex-1 space-y-1">
                                 <div class="text-[10px] font-bold text-[#4B5563] truncate">${file.name}</div>
-                                <input type="text" name="basliklar[${index}]" placeholder="AÃ§Ä±klama girin (opsiyonel)" class="w-full px-2.5 py-1.5 border border-[#E5E7EB] rounded-lg text-[10px] font-medium bg-white focus:border-[#C96A2B] outline-none">
+                                <input type="text" name="basliklar[${index}]" placeholder="Açıklama girin (opsiyonel)" class="w-full px-2.5 py-1.5 border border-[#E5E7EB] rounded-lg text-[10px] font-medium bg-white focus:border-[#C96A2B] outline-none">
                             </div>
                         `;
                         previewList.appendChild(item);
@@ -260,18 +260,18 @@
                     .then(data => {
                         if (data.success) {
                             if (typeof toastAc === 'function') {
-                                toastAc('FotoÄŸraf sÄ±ralamasÄ± baÅŸarÄ±yla gÃ¼ncellendi.', 'basarili');
+                                toastAc('Fotoğraf sıralaması başarıyla güncellendi.', 'basarili');
                             }
                         } else {
                             if (typeof toastAc === 'function') {
-                                toastAc('SÄ±ralama gÃ¼ncellenirken bir hata oluÅŸtu.', 'hata');
+                                toastAc('Sıralama güncellenirken bir hata oluştu.', 'hata');
                             }
                         }
                     })
                     .catch(err => {
                         console.error(err);
                         if (typeof toastAc === 'function') {
-                            toastAc('Sunucuyla baÄŸlantÄ± kurulamadÄ±.', 'hata');
+                            toastAc('Sunucuyla bağlantı kurulamadı.', 'hata');
                         }
                     });
                 }

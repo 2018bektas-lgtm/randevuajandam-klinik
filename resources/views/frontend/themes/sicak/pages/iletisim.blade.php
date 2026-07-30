@@ -1,4 +1,4 @@
-﻿@extends(theme_layout())
+@extends(theme_layout())
 
 @php
     $iletisim = $doktor['iletisim_sayfa'] ?? [];
