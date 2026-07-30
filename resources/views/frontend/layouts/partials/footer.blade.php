@@ -91,13 +91,15 @@
         <span>&copy; {{ date('Y') }} {{ $klinikAd }}. Tüm hakları saklıdır.</span>
         <span>
             Powered by Randevu Ajandam · Klinik Web
-            <span class="footer-legal" style="display:block;margin-top:.45rem;font-size:11px;opacity:.9">
-                <a href="{{ route('frontend.legal.kvkk') }}">KVKK</a>
-                ·
-                <a href="{{ route('frontend.legal.gizlilik') }}">Gizlilik</a>
-                ·
-                <a href="{{ route('frontend.legal.kullanim') }}">Kullanım</a>
-            </span>
+            @php $footerPages = site_footer_pages(); @endphp
+            @if($footerPages !== [])
+                <span class="footer-legal" style="display:block;margin-top:.45rem;font-size:11px;opacity:.9">
+                    @foreach($footerPages as $i => $fp)
+                        @if($i > 0) · @endif
+                        <a href="{{ $fp['href'] }}">{{ $fp['baslik'] }}</a>
+                    @endforeach
+                </span>
+            @endif
         </span>
     </div>
 </footer>

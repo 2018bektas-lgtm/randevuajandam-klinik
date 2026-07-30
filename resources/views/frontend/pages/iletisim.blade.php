@@ -148,7 +148,12 @@
                             <input type="checkbox" name="kvkk_onay" id="kvkk_onay" value="1" required>
                             <span>
                                 Kişisel verilerimin randevu oluşturma amacıyla işlenmesini kabul ediyorum. *
-                                <a href="{{ route('frontend.legal.kvkk') }}" target="_blank" rel="noopener" style="text-decoration:underline">KVKK metni</a>
+                                @php
+                                    $kvkkPage = collect(site_footer_pages())->first(fn ($p) => str_contains(mb_strtolower($p['slug'].' '.$p['baslik']), 'kvkk'));
+                                @endphp
+                                @if($kvkkPage)
+                                    <a href="{{ $kvkkPage['href'] }}" target="_blank" rel="noopener" style="text-decoration:underline">KVKK metni</a>
+                                @endif
                             </span>
                         </label>
                     </div>

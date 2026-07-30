@@ -33,10 +33,8 @@ Route::controller(SiteController::class)->group(function () {
     Route::get('/sss', 'sss')->name('frontend.sss');
     Route::get('/iletisim', 'iletisim')->name('frontend.iletisim');
     Route::get('/randevu', 'iletisim')->name('frontend.randevu');
-    // Klinik sitesi yasal metinleri (panel Site Ayarları → Yasal)
-    Route::get('/kvkk', 'yasalKvkk')->name('frontend.legal.kvkk');
-    Route::get('/gizlilik-politikasi', 'yasalGizlilik')->name('frontend.legal.gizlilik');
-    Route::get('/kullanim-kosullari', 'yasalKullanim')->name('frontend.legal.kullanim');
+    // Özel sayfalar (panel Site Ayarları → Sayfalar)
+    Route::get('/sayfa/{slug}', 'sayfa')->name('frontend.sayfa')->where('slug', '[a-z0-9\-]+');
     Route::get('/sitemap.xml', 'sitemap')->name('frontend.sitemap');
 });
 
@@ -114,12 +112,17 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/seo', [SiteAyarlariController::class, 'kaydetSeo'])->name('seo.kaydet');
             Route::get('/iletisim', [SiteAyarlariController::class, 'iletisim'])->name('iletisim');
             Route::post('/iletisim', [SiteAyarlariController::class, 'kaydetIletisim'])->name('iletisim.kaydet');
-            Route::get('/yasal', [SiteAyarlariController::class, 'yasal'])->name('yasal');
-            Route::post('/yasal', [SiteAyarlariController::class, 'kaydetYasal'])->name('yasal.kaydet');
+            Route::get('/sayfalar', [SiteAyarlariController::class, 'sayfalar'])->name('sayfalar');
+            Route::get('/sayfalar/yeni', [SiteAyarlariController::class, 'sayfaOlustur'])->name('sayfalar.yeni');
+            Route::post('/sayfalar', [SiteAyarlariController::class, 'sayfaKaydet'])->name('sayfalar.kaydet');
+            Route::get('/sayfalar/{id}/duzenle', [SiteAyarlariController::class, 'sayfaDuzenle'])->whereNumber('id')->name('sayfalar.duzenle');
+            Route::post('/sayfalar/{id}', [SiteAyarlariController::class, 'sayfaKaydet'])->whereNumber('id')->name('sayfalar.guncelle');
+            Route::delete('/sayfalar/{id}', [SiteAyarlariController::class, 'sayfaSil'])->whereNumber('id')->name('sayfalar.sil');
+            Route::post('/sayfalar/{id}/sil', [SiteAyarlariController::class, 'sayfaSil'])->whereNumber('id')->name('sayfalar.sil.post');
             Route::post('/reorder', [SiteAyarlariController::class, 'reorder'])->name('reorder');
             Route::post('/toggle', [SiteAyarlariController::class, 'toggle'])->name('toggle');
             Route::post('/{group}', [SiteAyarlariController::class, 'kaydet'])
-                ->where('group', 'genel|menu|slider|anasayfa|seo|iletisim|yasal')
+                ->where('group', 'genel|menu|slider|anasayfa|seo|iletisim|sayfalar')
                 ->name('kaydet');
         });
 

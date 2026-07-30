@@ -333,10 +333,40 @@ if (! function_exists('nav_href')) {
             return $url;
         }
         $route = (string) ($item['route'] ?? 'frontend.anasayfa');
+        // Özel sayfa: page.kvkk → /sayfa/kvkk
+        if (str_starts_with($route, 'page.')) {
+            $slug = substr($route, 5);
+
+            return $slug !== '' ? route('frontend.sayfa', ['slug' => $slug]) : url('/');
+        }
         try {
             return route($route);
         } catch (\Throwable) {
             return url('/');
+        }
+    }
+}
+
+if (! function_exists('site_footer_pages')) {
+    /**
+     * Footer’da gösterilecek özel sayfalar.
+     *
+     * @return array<int, array{baslik: string, href: string, slug: string}>
+     */
+    function site_footer_pages(): array
+    {
+        try {
+            return \App\Models\SitePage::query()
+                ->footer()
+                ->get()
+                ->map(fn ($p) => [
+                    'baslik' => $p->baslik,
+                    'href' => $p->publicUrl(),
+                    'slug' => $p->slug,
+                ])
+                ->all();
+        } catch (\Throwable) {
+            return [];
         }
     }
 }

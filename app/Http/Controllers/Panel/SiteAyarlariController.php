@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\SiteHomepageSection;
 use App\Models\SiteMenuItem;
+use App\Models\SitePage;
 use App\Models\SiteSliderSlide;
 use App\Services\SiteSettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class SiteAyarlariController extends Controller
 {
@@ -124,41 +126,97 @@ class SiteAyarlariController extends Controller
     }
 
     /**
-     * Klinik sitesinin kendi KVKK / gizlilik / kullanım metinleri.
-     * Platform (randevuajandam.com) yasal metinleri SaaS içindir; burası vitrin ziyaretçileri için.
+     * Özel sayfa yönetimi (KVKK, gizlilik, kampanya vb.).
+     * Menü dropdown'ından seçilir; footera checkbox ile eklenir.
      */
-    public function yasal()
+    public function sayfalar()
     {
-        return view('panel.site-ayarlari.yasal', [
-            'group' => 'yasal',
-            'ayarlar' => [
-                'kvkk' => $this->settings->option('yasal_kvkk', ''),
-                'gizlilik' => $this->settings->option('yasal_gizlilik', ''),
-                'kullanim' => $this->settings->option('yasal_kullanim', ''),
-            ],
-            'publicUrls' => [
-                'kvkk' => route('frontend.legal.kvkk'),
-                'gizlilik' => route('frontend.legal.gizlilik'),
-                'kullanim' => route('frontend.legal.kullanim'),
-            ],
+        return view('panel.site-ayarlari.sayfalar', [
+            'group' => 'sayfalar',
+            'pages' => SitePage::query()->orderBy('sira')->orderBy('id')->get(),
         ]);
     }
 
-    public function kaydetYasal(Request $request)
+    public function sayfaOlustur()
     {
-        $request->validate([
-            'kvkk' => ['nullable', 'string', 'max:50000'],
-            'gizlilik' => ['nullable', 'string', 'max:50000'],
-            'kullanim' => ['nullable', 'string', 'max:50000'],
+        return view('panel.site-ayarlari.sayfa-form', [
+            'group' => 'sayfalar',
+            'page' => null,
+        ]);
+    }
+
+    public function sayfaDuzenle(int $id)
+    {
+        $page = SitePage::query()->findOrFail($id);
+
+        return view('panel.site-ayarlari.sayfa-form', [
+            'group' => 'sayfalar',
+            'page' => $page,
+        ]);
+    }
+
+    public function sayfaKaydet(Request $request, ?int $id = null)
+    {
+        $data = $request->validate([
+            'baslik' => ['required', 'string', 'max:200'],
+            'slug' => ['nullable', 'string', 'max:200'],
+            'icerik' => ['nullable', 'string', 'max:100000'],
+            'aktif' => ['nullable'],
+            'footer_goster' => ['nullable'],
+            'sira' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ]);
 
-        $this->settings->setOptions([
-            'yasal_kvkk' => $request->input('kvkk', ''),
-            'yasal_gizlilik' => $request->input('gizlilik', ''),
-            'yasal_kullanim' => $request->input('kullanim', ''),
-        ]);
+        $slugInput = trim((string) ($data['slug'] ?? ''));
+        $slug = $slugInput !== ''
+            ? Str::slug($slugInput)
+            : SitePage::makeSlug($data['baslik'], $id);
+        if ($slug === '') {
+            $slug = SitePage::makeSlug($data['baslik'], $id);
+        }
+        // Unique slug
+        $slug = SitePage::makeSlug($slug, $id);
 
-        return back()->with('basari', 'Yasal metinler kaydedildi. Public sitede footer ve randevu formu bu metinlere bağlanır.');
+        $payload = [
+            'baslik' => $data['baslik'],
+            'slug' => $slug,
+            'icerik' => $data['icerik'] ?? '',
+            'aktif' => $request->boolean('aktif', true),
+            'footer_goster' => $request->boolean('footer_goster'),
+            'sira' => (int) ($data['sira'] ?? 0),
+        ];
+
+        if ($id) {
+            $page = SitePage::query()->findOrFail($id);
+            $page->update($payload);
+            $msg = 'Sayfa güncellendi.';
+        } else {
+            $page = SitePage::query()->create($payload);
+            $msg = 'Sayfa oluşturuldu.';
+        }
+
+        $this->settings->forgetCache();
+
+        return redirect()
+            ->route('panel.site-ayarlari.sayfalar')
+            ->with('basari', $msg.' Menüye eklemek için Site Ayarları → Menü → “Sayfa: …”. Footer için “Footer’da göster” işaretli olmalı.');
+    }
+
+    public function sayfaSil(int $id)
+    {
+        $page = SitePage::query()->findOrFail($id);
+        // Menüde bu sayfaya bağlı satırları temizle
+        SiteMenuItem::query()
+            ->where(function ($q) use ($page) {
+                $q->where('route', $page->menuRouteKey())
+                    ->orWhere('key', 'page_'.$page->slug);
+            })
+            ->delete();
+        $page->delete();
+        $this->settings->forgetCache();
+
+        return redirect()
+            ->route('panel.site-ayarlari.sayfalar')
+            ->with('basari', 'Sayfa silindi.');
     }
 
     public function temalar()
@@ -368,6 +426,10 @@ class SiteAyarlariController extends Controller
         $max = (int) SiteMenuItem::query()->max('sira');
 
         foreach ($pages as $route => $label) {
+            // Özel sayfalar otomatik menüye eklenmez; kullanıcı Menü’den seçer
+            if (str_starts_with($route, 'page.')) {
+                continue;
+            }
             $key = str_replace(['frontend.', '.'], ['', '_'], $route);
             $exists = SiteMenuItem::query()
                 ->where(function ($q) use ($key, $route) {
@@ -484,7 +546,7 @@ class SiteAyarlariController extends Controller
     /** @return array<string,string> route => label */
     protected function internalPageOptions(): array
     {
-        return [
+        $options = [
             'frontend.anasayfa' => 'Ana Sayfa',
             'frontend.hakkimda' => 'Hakkımızda',
             'frontend.hekimler' => 'Hekimlerimiz',
@@ -495,6 +557,16 @@ class SiteAyarlariController extends Controller
             'frontend.iletisim' => 'İletişim',
             'frontend.randevu' => 'Randevu',
         ];
+
+        try {
+            foreach (SitePage::query()->where('aktif', true)->orderBy('baslik')->get() as $p) {
+                $options[$p->menuRouteKey()] = 'Sayfa: '.$p->baslik;
+            }
+        } catch (\Throwable) {
+            // migration öncesi
+        }
+
+        return $options;
     }
 
     protected function validateSlideRequest(Request $request, bool $update = false): array
