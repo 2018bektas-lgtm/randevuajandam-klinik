@@ -211,7 +211,9 @@ if (! function_exists('theme_view')) {
 
 if (! function_exists('site_nav')) {
     /**
-     * @return array<int, array{href: string, label: string, match: ?string, external: bool, route?: mixed}>
+     * parent_id varsa alt menü (children) olarak gruplanır.
+     *
+     * @return array<int, array{href: string, label: string, match: ?string, external: bool, route?: mixed, children?: array}>
      */
     function site_nav(?array $doktor = null): array
     {
@@ -236,46 +238,78 @@ if (! function_exists('site_nav')) {
             'iletisim' => 'frontend.iletisim',
         ];
 
-        if (! empty($doktor['menu']) && is_array($doktor['menu'])) {
-            return collect($doktor['menu'])->map(function ($item) use ($matchMap) {
-                $key = $item['key'] ?? '';
-                $href = function_exists('nav_href') ? nav_href($item) : ($item['url'] ?? '#');
-                $isExternal = filled($item['url'] ?? null)
-                    && (str_starts_with((string) $item['url'], 'http') || str_starts_with((string) $item['url'], '//'));
+        $mapItem = static function (array $item) use ($matchMap): array {
+            $key = $item['key'] ?? '';
+            $href = function_exists('nav_href') ? nav_href($item) : ($item['url'] ?? '#');
+            $isExternal = filled($item['url'] ?? null)
+                && (str_starts_with((string) $item['url'], 'http') || str_starts_with((string) $item['url'], '//'));
+            $route = $item['route'] ?? null;
+            $match = $matchMap[$key] ?? $route;
+            if (is_string($route) && str_starts_with($route, 'page.')) {
+                $match = 'frontend.sayfa';
+            }
 
-                return [
-                    'href' => $href,
-                    'label' => $item['label'] ?? $key,
-                    'match' => $matchMap[$key] ?? ($item['route'] ?? null),
-                    'external' => $isExternal,
-                    'route' => $item['route'] ?? null,
-                ];
-            })->values()->all();
+            return [
+                'id' => (int) ($item['id'] ?? 0),
+                'href' => $href,
+                'label' => $item['label'] ?? $key,
+                'match' => $match,
+                'external' => $isExternal,
+                'route' => $route,
+                'children' => [],
+            ];
+        };
+
+        if (! empty($doktor['menu']) && is_array($doktor['menu'])) {
+            $flat = collect($doktor['menu'])->filter(fn ($i) => is_array($i))->values();
+            $byParent = $flat->groupBy(function ($i) {
+                $pid = $i['parent_id'] ?? null;
+
+                return $pid ? (int) $pid : 0;
+            });
+
+            $build = static function ($parentKey) use (&$build, $byParent, $mapItem) {
+                return ($byParent->get($parentKey, collect()))
+                    ->sortBy(fn ($i) => (int) ($i['sira'] ?? 0))
+                    ->map(function ($item) use ($build, $mapItem) {
+                        $mapped = $mapItem($item);
+                        $id = (int) ($item['id'] ?? 0);
+                        if ($id > 0) {
+                            $mapped['children'] = $build($id);
+                        }
+
+                        return $mapped;
+                    })
+                    ->values()
+                    ->all();
+            };
+
+            return $build(0);
         }
 
         $nav = [
-            ['href' => route('frontend.anasayfa'), 'label' => 'Ana Sayfa', 'match' => 'frontend.anasayfa', 'external' => false],
+            ['href' => route('frontend.anasayfa'), 'label' => 'Ana Sayfa', 'match' => 'frontend.anasayfa', 'external' => false, 'children' => []],
         ];
         if (\Illuminate\Support\Facades\Route::has('frontend.hakkimda')) {
-            $nav[] = ['href' => route('frontend.hakkimda'), 'label' => 'Hakkımızda', 'match' => 'frontend.hakkimda', 'external' => false];
+            $nav[] = ['href' => route('frontend.hakkimda'), 'label' => 'Hakkımızda', 'match' => 'frontend.hakkimda', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.hekimler')) {
-            $nav[] = ['href' => route('frontend.hekimler'), 'label' => 'Hekimler', 'match' => 'frontend.hekim*', 'external' => false];
+            $nav[] = ['href' => route('frontend.hekimler'), 'label' => 'Hekimler', 'match' => 'frontend.hekim*', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.hizmetler')) {
-            $nav[] = ['href' => route('frontend.hizmetler'), 'label' => 'Hizmetler', 'match' => 'frontend.hizmet*', 'external' => false];
+            $nav[] = ['href' => route('frontend.hizmetler'), 'label' => 'Hizmetler', 'match' => 'frontend.hizmet*', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.galeri')) {
-            $nav[] = ['href' => route('frontend.galeri'), 'label' => 'Galeri', 'match' => 'frontend.galeri', 'external' => false];
+            $nav[] = ['href' => route('frontend.galeri'), 'label' => 'Galeri', 'match' => 'frontend.galeri', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.blog')) {
-            $nav[] = ['href' => route('frontend.blog'), 'label' => 'Blog', 'match' => 'frontend.blog*', 'external' => false];
+            $nav[] = ['href' => route('frontend.blog'), 'label' => 'Blog', 'match' => 'frontend.blog*', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.sss')) {
-            $nav[] = ['href' => route('frontend.sss'), 'label' => 'S.S.S.', 'match' => 'frontend.sss', 'external' => false];
+            $nav[] = ['href' => route('frontend.sss'), 'label' => 'S.S.S.', 'match' => 'frontend.sss', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.iletisim')) {
-            $nav[] = ['href' => route('frontend.iletisim'), 'label' => 'İletişim', 'match' => 'frontend.iletisim', 'external' => false];
+            $nav[] = ['href' => route('frontend.iletisim'), 'label' => 'İletişim', 'match' => 'frontend.iletisim', 'external' => false, 'children' => []];
         }
 
         return $nav;

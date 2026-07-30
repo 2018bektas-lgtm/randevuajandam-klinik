@@ -17,12 +17,8 @@
                 <small>{{ $doktor['uzmanlik'] ?? 'Klinik' }}</small>
             </span>
         </a>
-        <nav class="th-modern-nav" aria-label="Ana menü">
-            @foreach ($nav as $item)
-                @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-                <a href="{{ $item['href'] }}" class="{{ $active ? 'is-active' : '' }}"
-                   @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>{{ $item['label'] }}</a>
-            @endforeach
+        <nav class="th-modern-nav nav-desktop" aria-label="Ana menü">
+            @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'desktop'])
         </nav>
         <div class="th-modern-actions">
             <a href="{{ route('frontend.randevu') }}" class="th-modern-cta">Randevu</a>
@@ -30,9 +26,7 @@
         </div>
     </div>
     <div class="mobile-nav th-modern-mobile" id="mobile-menu">
-        @foreach ($nav as $item)
-            <a href="{{ $item['href'] }}" @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>{{ $item['label'] }}</a>
-        @endforeach
+        @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'mobile'])
         <a href="{{ route('frontend.randevu') }}" class="btn btn-primary" style="margin-top:.5rem">Online Randevu</a>
     </div>
 </header>

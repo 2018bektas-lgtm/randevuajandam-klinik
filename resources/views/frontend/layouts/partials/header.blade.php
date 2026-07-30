@@ -1,41 +1,6 @@
 @php
-    $matchMap = [
-        'anasayfa' => 'frontend.anasayfa',
-        'hakkimda' => 'frontend.hakkimda',
-        'hekimler' => 'frontend.hekim*',
-        'hizmetler' => 'frontend.hizmet*',
-        'galeri' => 'frontend.galeri',
-        'blog' => 'frontend.blog*',
-        'sss' => 'frontend.sss',
-        'iletisim' => 'frontend.iletisim',
-    ];
+    $nav = function_exists('site_nav') ? site_nav($doktor ?? null) : [];
     $klinikAd = $doktor['klinik_adi'] ?? trim(($doktor['unvan'] ?? '').' '.($doktor['ad_soyad'] ?? 'Klinik'));
-    if (! empty($doktor['menu']) && is_array($doktor['menu'])) {
-        $nav = collect($doktor['menu'])->map(function ($item) use ($matchMap) {
-            $key = $item['key'] ?? '';
-            $href = nav_href($item);
-            $isExternal = filled($item['url'] ?? null)
-                && (str_starts_with($item['url'], 'http') || str_starts_with($item['url'], '//'));
-
-            return [
-                'href' => $href,
-                'label' => $item['label'] ?? $key,
-                'match' => $matchMap[$key] ?? ($item['route'] ?? null),
-                'external' => $isExternal,
-            ];
-        })->values()->all();
-    } else {
-        $nav = [
-            ['href' => route('frontend.anasayfa'), 'label' => 'Ana Sayfa', 'match' => 'frontend.anasayfa', 'external' => false],
-            ['href' => route('frontend.hakkimda'), 'label' => 'Hakkımızda', 'match' => 'frontend.hakkimda', 'external' => false],
-            ['href' => route('frontend.hekimler'), 'label' => 'Hekimlerimiz', 'match' => 'frontend.hekim*', 'external' => false],
-            ['href' => route('frontend.hizmetler'), 'label' => 'Hizmetler', 'match' => 'frontend.hizmet*', 'external' => false],
-            ['href' => route('frontend.galeri'), 'label' => 'Galeri', 'match' => 'frontend.galeri', 'external' => false],
-            ['href' => route('frontend.blog'), 'label' => 'Blog', 'match' => 'frontend.blog*', 'external' => false],
-            ['href' => route('frontend.sss'), 'label' => 'S.S.S.', 'match' => 'frontend.sss', 'external' => false],
-            ['href' => route('frontend.iletisim'), 'label' => 'İletişim', 'match' => 'frontend.iletisim', 'external' => false],
-        ];
-    }
 @endphp
 
 <div class="topbar">
@@ -74,14 +39,7 @@
         </a>
 
         <nav class="nav-desktop" aria-label="Ana menü">
-            @foreach ($nav as $item)
-                @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-                <a href="{{ $item['href'] }}"
-                   class="{{ $active ? 'active' : '' }}"
-                   @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>
-                    {{ $item['label'] }}
-                </a>
-            @endforeach
+            @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'desktop'])
         </nav>
 
         <div class="header-actions">
@@ -98,14 +56,7 @@
     </div>
 
     <div class="mobile-nav" id="mobile-menu">
-        @foreach ($nav as $item)
-            @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-            <a href="{{ $item['href'] }}"
-               class="{{ $active ? 'active' : '' }}"
-               @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>
-                {{ $item['label'] }}
-            </a>
-        @endforeach
+        @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'mobile'])
         <a href="{{ route('frontend.randevu') }}" class="btn btn-primary" style="margin:.5rem 0 0;width:100%">Online Randevu</a>
     </div>
 </header>

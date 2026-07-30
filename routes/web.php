@@ -100,6 +100,8 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/temalar', [SiteAyarlariController::class, 'kaydetTema'])->name('temalar.kaydet');
             Route::get('/menu', [SiteAyarlariController::class, 'menu'])->name('menu');
             Route::post('/menu', [SiteAyarlariController::class, 'menuKaydet'])->name('menu.kaydet');
+            Route::post('/menu/ekle', [SiteAyarlariController::class, 'menuEkle'])->name('menu.ekle');
+            Route::post('/menu/{id}/sil', [SiteAyarlariController::class, 'menuSil'])->whereNumber('id')->name('menu.sil');
             Route::get('/slider', [SiteAyarlariController::class, 'slider'])->name('slider');
             Route::post('/slider', [SiteAyarlariController::class, 'sliderStore'])->name('slider.store');
             Route::put('/slider/{id}', [SiteAyarlariController::class, 'sliderUpdate'])->name('slider.update');

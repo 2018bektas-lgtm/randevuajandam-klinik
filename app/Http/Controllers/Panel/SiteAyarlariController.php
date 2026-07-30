@@ -48,10 +48,29 @@ class SiteAyarlariController extends Controller
     {
         $this->syncSystemMenuItems();
 
+        $items = $this->settings->menuItems();
+        $roots = $items->whereNull('parent_id')->values();
+        $childrenByParent = $items->whereNotNull('parent_id')->groupBy('parent_id');
+
+        $ordered = collect();
+        foreach ($roots as $root) {
+            $ordered->push($root);
+            foreach ($childrenByParent->get($root->id, collect()) as $child) {
+                $ordered->push($child);
+            }
+        }
+        foreach ($items as $item) {
+            if ($item->parent_id && ! $roots->contains('id', $item->parent_id) && ! $ordered->contains('id', $item->id)) {
+                $ordered->push($item);
+            }
+        }
+
         return view('panel.site-ayarlari.menu', [
             'group' => 'menu',
-            'items' => $this->settings->menuItems(),
+            'items' => $ordered,
+            'rootItems' => $roots,
             'pageOptions' => $this->internalPageOptions(),
+            'pageGroups' => $this->internalPageGroups(),
         ]);
     }
 
@@ -386,10 +405,17 @@ class SiteAyarlariController extends Controller
         $urls = $request->input('url', []);
         $routes = $request->input('route', []);
         $linkTypes = $request->input('link_type', []);
+        $parents = $request->input('parent_id', []);
         $aktif = $request->input('aktif', []);
         $allowedRoutes = array_keys($this->internalPageOptions());
+        $validRootIds = SiteMenuItem::query()->pluck('id')->map(fn ($id) => (int) $id)->all();
 
         foreach ($ids as $i => $id) {
+            $id = (int) $id;
+            if ($id < 1) {
+                continue;
+            }
+
             $type = (string) ($linkTypes[$i] ?? 'route');
             if (! in_array($type, ['route', 'url'], true)) {
                 $type = 'route';
@@ -416,53 +442,140 @@ class SiteAyarlariController extends Controller
             if ($label === '' && $type === 'route') {
                 $label = $this->internalPageOptions()[$route] ?? $route;
             }
+            if ($label === '') {
+                $label = 'Menü öğesi';
+            }
 
-            SiteMenuItem::query()->where('id', (int) $id)->update([
+            $parentId = (int) ($parents[$i] ?? 0);
+            if ($parentId === $id || $parentId < 1 || ! in_array($parentId, $validRootIds, true)) {
+                $parentId = null;
+            } else {
+                $parentRow = SiteMenuItem::query()->find($parentId);
+                if (! $parentRow || $parentRow->parent_id) {
+                    $parentId = null;
+                }
+            }
+
+            SiteMenuItem::query()->where('id', $id)->update([
                 'label' => $label,
                 'route' => $route,
                 'url' => $type === 'url' ? $url : null,
+                'parent_id' => $parentId,
                 'aktif' => ! empty($aktif[$i]),
+                'sira' => $i + 1,
             ]);
         }
+
+        $parentIdsWithChildren = SiteMenuItem::query()
+            ->whereNotNull('parent_id')
+            ->pluck('parent_id')
+            ->unique()
+            ->filter()
+            ->values()
+            ->all();
+        if ($parentIdsWithChildren !== []) {
+            SiteMenuItem::query()->whereIn('id', $parentIdsWithChildren)->update(['parent_id' => null]);
+        }
+        $rootIds = SiteMenuItem::query()->whereNull('parent_id')->pluck('id')->all();
+        SiteMenuItem::query()
+            ->whereNotNull('parent_id')
+            ->whereNotIn('parent_id', $rootIds ?: [0])
+            ->update(['parent_id' => null]);
+
         $this->settings->forgetCache();
 
         return back()->with('basari', 'Menü kaydedildi.');
     }
 
+    public function menuEkle(Request $request)
+    {
+        $max = (int) SiteMenuItem::query()->max('sira');
+        $parentId = (int) $request->input('parent_id', 0);
+        if ($parentId > 0) {
+            $parent = SiteMenuItem::query()->find($parentId);
+            if (! $parent || $parent->parent_id) {
+                $parentId = 0;
+            }
+        }
+
+        SiteMenuItem::query()->create([
+            'parent_id' => $parentId > 0 ? $parentId : null,
+            'key' => 'ozel_'.substr(uniqid(), -6),
+            'label' => $parentId > 0 ? 'Yeni alt menü' : 'Yeni menü öğesi',
+            'route' => 'frontend.anasayfa',
+            'url' => null,
+            'aktif' => true,
+            'sira' => $max + 1,
+        ]);
+        $this->settings->forgetCache();
+
+        return back()->with('basari', 'Menü öğesi eklendi. Etiket ve bağlantıyı düzenleyip kaydedin.');
+    }
+
+    public function menuSil(int $id)
+    {
+        $item = SiteMenuItem::query()->find($id);
+        if ($item) {
+            SiteMenuItem::query()->where('parent_id', $item->id)->update(['parent_id' => null]);
+            $item->delete();
+            $this->settings->forgetCache();
+        }
+
+        return back()->with('basari', 'Menü öğesi silindi.');
+    }
+
     /**
-     * Sistemdeki tüm public sayfaları menü tablosuna ekle (eksik olanlar).
+     * Menü boşsa varsayılan sistem sayfalarını ekle.
      */
     protected function syncSystemMenuItems(): void
     {
-        $pages = $this->internalPageOptions();
-        $max = (int) SiteMenuItem::query()->max('sira');
+        if (SiteMenuItem::query()->exists()) {
+            return;
+        }
 
-        foreach ($pages as $route => $label) {
-            // Özel sayfalar otomatik menüye eklenmez; kullanıcı Menü’den seçer
-            if (str_starts_with($route, 'page.')) {
-                continue;
-            }
-            $key = str_replace(['frontend.', '.'], ['', '_'], $route);
-            $exists = SiteMenuItem::query()
-                ->where(function ($q) use ($key, $route) {
-                    $q->where('key', $key)->orWhere('route', $route);
-                })
-                ->exists();
+        $defaults = [
+            'frontend.anasayfa' => 'Ana Sayfa',
+            'frontend.hakkimda' => 'Hakkımızda',
+            'frontend.hekimler' => 'Hekimlerimiz',
+            'frontend.hizmetler' => 'Hizmetler',
+            'frontend.galeri' => 'Galeri',
+            'frontend.blog' => 'Blog',
+            'frontend.sss' => 'S.S.S.',
+            'frontend.iletisim' => 'İletişim',
+        ];
 
-            if ($exists) {
-                continue;
-            }
-
-            $max++;
+        $sira = 0;
+        foreach ($defaults as $route => $label) {
+            $sira++;
             SiteMenuItem::query()->create([
-                'key' => $key,
+                'parent_id' => null,
+                'key' => str_replace(['frontend.', '.'], ['', '_'], $route),
                 'label' => $label,
                 'route' => $route,
                 'url' => null,
                 'aktif' => true,
-                'sira' => $max,
+                'sira' => $sira,
             ]);
         }
+    }
+
+    /**
+     * @return array{system: array<string,string>, pages: array<string,string>}
+     */
+    protected function internalPageGroups(): array
+    {
+        $all = $this->internalPageOptions();
+        $system = [];
+        $pages = [];
+        foreach ($all as $route => $label) {
+            if (str_starts_with($route, 'page.')) {
+                $pages[$route] = $label;
+            } else {
+                $system[$route] = $label;
+            }
+        }
+
+        return compact('system', 'pages');
     }
 
     public function anasayfaKaydet(Request $request)

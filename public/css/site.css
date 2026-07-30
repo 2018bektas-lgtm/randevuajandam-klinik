@@ -275,6 +275,45 @@ a:hover { color: var(--copper); }
   background: var(--white);
   box-shadow: 0 4px 16px rgba(20,18,31,.06);
 }
+.nav-desktop .nav-item.has-dropdown {
+  position: relative;
+}
+.nav-desktop .nav-item.has-dropdown > a {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+.nav-desktop .nav-caret {
+  font-size: .65rem;
+  opacity: .7;
+}
+.nav-desktop .nav-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 11.5rem;
+  padding: .4rem;
+  background: #fff;
+  border: 1px solid var(--line, #E5E7EB);
+  border-radius: .85rem;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, .1);
+  z-index: 40;
+}
+.nav-desktop .nav-item.has-dropdown:hover .nav-dropdown,
+.nav-desktop .nav-item.has-dropdown:focus-within .nav-dropdown {
+  display: block;
+}
+.nav-desktop .nav-dropdown a {
+  display: block;
+  border-radius: .65rem;
+  white-space: nowrap;
+}
+.mobile-nav-child {
+  padding-left: 1.5rem !important;
+  font-size: .9em;
+  color: #64748b !important;
+}
 .header-actions { display: flex; align-items: center; gap: .5rem; }
 .menu-toggle {
   display: inline-flex;

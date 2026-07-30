@@ -13,19 +13,13 @@
             <span class="th-min-name">{{ trim(($doktor['unvan'] ?? '').' '.($doktor['ad_soyad'] ?? 'Hekim')) }}</span>
             <span class="th-min-role">{{ $doktor['uzmanlik'] ?? '' }}</span>
         </a>
-        <nav class="th-min-nav" aria-label="Ana menü">
-            @foreach ($nav as $item)
-                @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-                <a href="{{ $item['href'] }}" class="{{ $active ? 'is-active' : '' }}"
-                   @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>{{ $item['label'] }}</a>
-            @endforeach
+        <nav class="th-min-nav nav-desktop" aria-label="Ana menü">
+            @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'desktop'])
         </nav>
         <a href="{{ route('frontend.randevu') }}" class="th-min-cta">Randevu</a>
         <button type="button" class="menu-toggle th-min-menu" id="mobile-menu-btn" aria-label="Menü">☰</button>
     </div>
     <div class="mobile-nav" id="mobile-menu">
-        @foreach ($nav as $item)
-            <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
-        @endforeach
+        @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'mobile'])
     </div>
 </header>

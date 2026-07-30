@@ -75,14 +75,7 @@
         </a>
 
         <nav class="nav-desktop" aria-label="Ana menü">
-            @foreach ($nav as $item)
-                @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-                <a href="{{ $item['href'] }}"
-                   class="{{ $active ? 'active' : '' }}"
-                   @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>
-                    {{ $item['label'] }}
-                </a>
-            @endforeach
+            @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'desktop'])
         </nav>
 
         <div class="header-actions">
@@ -99,14 +92,7 @@
     </div>
 
     <div class="mobile-nav" id="mobile-menu">
-        @foreach ($nav as $item)
-            @php $active = !empty($item['match']) && request()->routeIs($item['match']); @endphp
-            <a href="{{ $item['href'] }}"
-               class="{{ $active ? 'active' : '' }}"
-               @if(!empty($item['external'])) target="_blank" rel="noopener" @endif>
-                {{ $item['label'] }}
-            </a>
-        @endforeach
+        @include('frontend.layouts.partials.nav-items', ['nav' => $nav, 'mode' => 'mobile'])
         <a href="{{ route('frontend.randevu') }}" class="btn btn-primary" style="margin:.5rem 0 0;width:100%">Online Randevu</a>
     </div>
 </header>
