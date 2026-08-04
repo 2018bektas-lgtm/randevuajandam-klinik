@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'panel.auth' => \App\Http\Middleware\DoctorPanelAuth::class,
             'panel.api' => \App\Http\Middleware\RequireApiIntegration::class,
+            'panel.paket' => \App\Http\Middleware\RequirePaketOzellik::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

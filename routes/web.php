@@ -16,6 +16,7 @@ use App\Http\Controllers\Panel\RandevuController;
 use App\Http\Controllers\Panel\SiteAyarlariController;
 use App\Http\Controllers\Panel\TwoFactorController;
 use App\Http\Controllers\Panel\YorumController;
+use App\Http\Controllers\Panel\PaketExtraController;
 use Illuminate\Support\Facades\Route;
 
 // ——— Public klinik website ———
@@ -137,47 +138,73 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::get('/profil', [ProfilController::class, 'edit'])->name('profil');
             Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
             Route::post('/profil', [ProfilController::class, 'update'])->name('profil.post');
-            Route::get('/hakkimda', [ProfilController::class, 'hakkimda'])->name('hakkimda');
-            Route::post('/hakkimda', [ProfilController::class, 'hakkimdaGuncelle'])->name('hakkimda.post');
-            Route::put('/hakkimda', [ProfilController::class, 'hakkimdaGuncelle'])->name('hakkimda.update');
+            Route::middleware('panel.paket:hakkimda')->group(function () {
+                Route::get('/hakkimda', [ProfilController::class, 'hakkimda'])->name('hakkimda');
+                Route::post('/hakkimda', [ProfilController::class, 'hakkimdaGuncelle'])->name('hakkimda.post');
+                Route::put('/hakkimda', [ProfilController::class, 'hakkimdaGuncelle'])->name('hakkimda.update');
+            });
             Route::get('/sifre', [ProfilController::class, 'sifreFormu'])->name('sifre');
             Route::put('/sifre', [ProfilController::class, 'sifreGuncelle'])->name('sifre.update');
             Route::post('/sifre', [ProfilController::class, 'sifreGuncelle'])->name('sifre.post');
 
-            // 2FA yönetimi
             Route::get('/2fa/ayarlar', [TwoFactorController::class, 'setupForm'])->name('two-factor');
             Route::post('/2fa/onayla', [TwoFactorController::class, 'setupConfirm'])->name('two-factor.confirm');
             Route::post('/2fa/kapat', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
             Route::post('/2fa/yedek-kodlar', [TwoFactorController::class, 'regenerateRecovery'])->name('two-factor.recovery');
 
-            // Online görüşme (platform WebRTC odasına yönlendirir)
-            Route::get('/gorusme/{id}', [GorusmeController::class, 'join'])->whereNumber('id')->name('gorusme.join');
+            Route::middleware('panel.paket:online_gorusme')->get('/gorusme/{id}', [GorusmeController::class, 'join'])->whereNumber('id')->name('gorusme.join');
 
-            Route::get('/randevular', [RandevuController::class, 'index'])->name('randevular');
-            Route::get('/randevular/events', [RandevuController::class, 'events'])->name('randevular.events');
-            Route::post('/randevular/periyot', [RandevuController::class, 'updatePeriod'])->name('randevular.periyot');
-            Route::post('/randevular', [RandevuController::class, 'store'])->name('randevular.store');
-            Route::delete('/randevular/{id}', [RandevuController::class, 'destroy'])->name('randevular.destroy');
-            Route::post('/randevular/{id}/sil', [RandevuController::class, 'destroy']);
-            Route::get('/randevular/talepler', [RandevuController::class, 'talepler'])->name('randevular.talepler');
+            Route::middleware('panel.paket:online_takvim')->group(function () {
+                Route::get('/randevular', [RandevuController::class, 'index'])->name('randevular');
+                Route::get('/randevular/events', [RandevuController::class, 'events'])->name('randevular.events');
+                Route::post('/randevular/periyot', [RandevuController::class, 'updatePeriod'])->name('randevular.periyot');
+                Route::post('/randevular', [RandevuController::class, 'store'])->name('randevular.store');
+                Route::delete('/randevular/{id}', [RandevuController::class, 'destroy'])->name('randevular.destroy');
+                Route::post('/randevular/{id}/sil', [RandevuController::class, 'destroy']);
+                Route::put('/randevular/{id}/guncelle', [RandevuController::class, 'guncelle'])->name('randevular.guncelle');
+                Route::post('/randevular/{id}/guncelle', [RandevuController::class, 'guncelle']);
+                Route::get('/hastalar/ara', [RandevuController::class, 'hastaAra'])->name('randevular.hastalar-ara');
+                Route::post('/hastalar', [RandevuController::class, 'hastaEkle'])->name('randevular.hasta-ekle');
+                Route::post('/randevular/{id}/reschedule', [RandevuController::class, 'reschedule'])->name('randevular.reschedule');
+                Route::get('/randevu-ayarlari', [RandevuController::class, 'ayarlar'])->name('randevu-ayarlari');
+                Route::put('/randevu-ayarlari', [RandevuController::class, 'ayarlarKaydet'])->name('randevu-ayarlari.update');
+                Route::post('/randevu-ayarlari', [RandevuController::class, 'ayarlarKaydet']);
+                Route::put('/calisma-saatleri', [RandevuController::class, 'calismaSaatleriKaydet'])->name('calisma-saatleri.update');
+                Route::post('/calisma-saatleri', [RandevuController::class, 'calismaSaatleriKaydet']);
+                Route::post('/randevu/izin-ekle', [RandevuController::class, 'izinEkle'])->name('randevu.izin-ekle');
+                Route::post('/randevu/izin-sil/{id}', [RandevuController::class, 'izinSil'])->name('randevu.izin-sil');
+                Route::delete('/randevu/izin-sil/{id}', [RandevuController::class, 'izinSil']);
+            });
+
+            Route::middleware('panel.paket:randevu_talepleri,randevu_talebi_goruntule')->get('/randevular/talepler', [RandevuController::class, 'talepler'])->name('randevular.talepler');
             Route::put('/randevular/{id}/durum', [RandevuController::class, 'durum'])->name('randevular.durum');
             Route::post('/randevular/{id}/durum', [RandevuController::class, 'durum']);
-            Route::put('/randevular/{id}/guncelle', [RandevuController::class, 'guncelle'])->name('randevular.guncelle');
-            Route::post('/randevular/{id}/guncelle', [RandevuController::class, 'guncelle']);
-            Route::get('/hastalar/ara', [RandevuController::class, 'hastaAra'])->name('randevular.hastalar-ara');
-            Route::post('/hastalar', [RandevuController::class, 'hastaEkle'])->name('randevular.hasta-ekle');
-            Route::get('/hastalar', [RandevuController::class, 'hastalar'])->name('hastalar');
-            Route::post('/randevular/{id}/reschedule', [RandevuController::class, 'reschedule'])->name('randevular.reschedule');
-            Route::get('/randevu/hizli-kapat-slotlar', [RandevuController::class, 'hizliKapatSlots'])->name('randevu.hizli-kapat-slotlar');
-            Route::post('/randevu/hizli-kapat', [RandevuController::class, 'hizliKapatKaydet'])->name('randevu.hizli-kapat');
-            Route::get('/randevu-ayarlari', [RandevuController::class, 'ayarlar'])->name('randevu-ayarlari');
-            Route::put('/randevu-ayarlari', [RandevuController::class, 'ayarlarKaydet'])->name('randevu-ayarlari.update');
-            Route::post('/randevu-ayarlari', [RandevuController::class, 'ayarlarKaydet']);
-            Route::put('/calisma-saatleri', [RandevuController::class, 'calismaSaatleriKaydet'])->name('calisma-saatleri.update');
-            Route::post('/calisma-saatleri', [RandevuController::class, 'calismaSaatleriKaydet']);
-            Route::post('/randevu/izin-ekle', [RandevuController::class, 'izinEkle'])->name('randevu.izin-ekle');
-            Route::post('/randevu/izin-sil/{id}', [RandevuController::class, 'izinSil'])->name('randevu.izin-sil');
-            Route::delete('/randevu/izin-sil/{id}', [RandevuController::class, 'izinSil']);
+            Route::middleware('panel.paket:hasta_kartlari')->group(function () {
+                Route::get('/hastalar', [RandevuController::class, 'hastalar'])->name('hastalar');
+                Route::get('/hastalar/{id}', [PaketExtraController::class, 'hastaDetay'])->name('hastalar.detay')->whereNumber('id');
+                Route::middleware('panel.paket:hasta_export')->get('/hastalar-export', [PaketExtraController::class, 'hastaExport'])->name('hastalar.export');
+                Route::middleware('panel.paket:hasta_not_dosya')->group(function () {
+                    Route::post('/hastalar/{id}/dosya', [PaketExtraController::class, 'hastaDosyaYukle'])->name('hastalar.dosya')->whereNumber('id');
+                    Route::delete('/hastalar/dosya/{id}', [PaketExtraController::class, 'hastaDosyaSil'])->name('hastalar.dosya.sil')->whereNumber('id');
+                });
+            });
+            Route::middleware('panel.paket:bekleme_listesi')->group(function () {
+                Route::get('/bekleme-listesi', [PaketExtraController::class, 'bekleme'])->name('bekleme');
+                Route::post('/bekleme-listesi/{id}/durum', [PaketExtraController::class, 'beklemeDurum'])->name('bekleme.durum')->whereNumber('id');
+                Route::post('/bekleme-listesi/{id}/bildir', [PaketExtraController::class, 'beklemeBildir'])->name('bekleme.bildir')->whereNumber('id');
+                Route::delete('/bekleme-listesi/{id}', [PaketExtraController::class, 'beklemeSil'])->name('bekleme.sil')->whereNumber('id');
+            });
+            Route::middleware('panel.paket:ical_export')->get('/takvim/ical', [PaketExtraController::class, 'ical'])->name('randevular.ical');
+            Route::middleware('panel.paket:onam_formu')->group(function () {
+                Route::get('/onam-formlari', [PaketExtraController::class, 'onamIndex'])->name('onam.index');
+                Route::post('/onam-formlari', [PaketExtraController::class, 'onamStore'])->name('onam.store');
+                Route::delete('/onam-formlari/{id}', [PaketExtraController::class, 'onamDestroy'])->name('onam.destroy')->whereNumber('id');
+                Route::post('/onam-formlari/imza', [PaketExtraController::class, 'onamImza'])->name('onam.imza');
+            });
+            Route::middleware('panel.paket:hizli_slot')->group(function () {
+                Route::get('/randevu/hizli-kapat-slotlar', [RandevuController::class, 'hizliKapatSlots'])->name('randevu.hizli-kapat-slotlar');
+                Route::post('/randevu/hizli-kapat', [RandevuController::class, 'hizliKapatKaydet'])->name('randevu.hizli-kapat');
+            });
 
             Route::get('/hizmetler', [HizmetController::class, 'index'])->name('hizmetler');
             Route::get('/hizmetler/ekle', [HizmetController::class, 'create'])->name('hizmetler.create');
@@ -187,79 +214,94 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/hizmetler/{id}', [HizmetController::class, 'update']);
             Route::delete('/hizmetler/{id}', [HizmetController::class, 'destroy'])->name('hizmetler.destroy');
 
-            Route::get('/bloglar', [BlogController::class, 'index'])->name('bloglar');
-            Route::get('/bloglar/ekle', [BlogController::class, 'create'])->name('bloglar.create');
-            Route::post('/bloglar', [BlogController::class, 'store'])->name('bloglar.store');
-            Route::get('/bloglar/{id}/duzenle', [BlogController::class, 'edit'])->name('bloglar.edit');
-            Route::put('/bloglar/{id}', [BlogController::class, 'update'])->name('bloglar.update');
-            Route::post('/bloglar/{id}', [BlogController::class, 'update']);
-            Route::delete('/bloglar/{id}', [BlogController::class, 'destroy'])->name('bloglar.destroy');
+            Route::middleware('panel.paket:blog')->group(function () {
+                Route::get('/bloglar', [BlogController::class, 'index'])->name('bloglar');
+                Route::get('/bloglar/ekle', [BlogController::class, 'create'])->name('bloglar.create');
+                Route::post('/bloglar', [BlogController::class, 'store'])->name('bloglar.store');
+                Route::get('/bloglar/{id}/duzenle', [BlogController::class, 'edit'])->name('bloglar.edit');
+                Route::put('/bloglar/{id}', [BlogController::class, 'update'])->name('bloglar.update');
+                Route::post('/bloglar/{id}', [BlogController::class, 'update']);
+                Route::delete('/bloglar/{id}', [BlogController::class, 'destroy'])->name('bloglar.destroy');
+            });
 
-            // Eğitimler (API senkron — ana site hekim paneli ile aynı)
-            Route::get('/egitimler', [EgitimController::class, 'index'])->name('egitimler.index');
-            Route::get('/egitimler/olustur', [EgitimController::class, 'create'])->name('egitimler.create');
-            Route::post('/egitimler', [EgitimController::class, 'store'])->name('egitimler.store');
-            Route::get('/egitimler/basvurular', [EgitimController::class, 'basvurularTumu'])->name('egitimler.basvurular.tumu');
-            Route::get('/egitimler/{id}/duzenle', [EgitimController::class, 'edit'])->name('egitimler.edit')->whereNumber('id');
-            Route::put('/egitimler/{id}', [EgitimController::class, 'update'])->name('egitimler.update')->whereNumber('id');
-            Route::post('/egitimler/{id}', [EgitimController::class, 'update'])->whereNumber('id');
-            Route::delete('/egitimler/{id}', [EgitimController::class, 'destroy'])->name('egitimler.destroy')->whereNumber('id');
-            Route::get('/egitimler/{id}/basvurular', [EgitimController::class, 'basvurular'])->name('egitimler.basvurular')->whereNumber('id');
-            Route::post('/egitimler/{id}/basvurular/{basvuruId}/durum', [EgitimController::class, 'basvuruDurum'])->name('egitimler.basvuru.durum')->whereNumber('id')->whereNumber('basvuruId');
-            Route::post('/egitimler/{id}/basvurular/{basvuruId}/odeme', [EgitimController::class, 'basvuruOdeme'])->name('egitimler.basvuru.odeme')->whereNumber('id')->whereNumber('basvuruId');
+            Route::middleware('panel.paket:egitimler')->group(function () {
+                Route::get('/egitimler', [EgitimController::class, 'index'])->name('egitimler.index');
+                Route::get('/egitimler/olustur', [EgitimController::class, 'create'])->name('egitimler.create');
+                Route::post('/egitimler', [EgitimController::class, 'store'])->name('egitimler.store');
+                Route::get('/egitimler/basvurular', [EgitimController::class, 'basvurularTumu'])->name('egitimler.basvurular.tumu');
+                Route::get('/egitimler/{id}/duzenle', [EgitimController::class, 'edit'])->name('egitimler.edit')->whereNumber('id');
+                Route::put('/egitimler/{id}', [EgitimController::class, 'update'])->name('egitimler.update')->whereNumber('id');
+                Route::post('/egitimler/{id}', [EgitimController::class, 'update'])->whereNumber('id');
+                Route::delete('/egitimler/{id}', [EgitimController::class, 'destroy'])->name('egitimler.destroy')->whereNumber('id');
+                Route::get('/egitimler/{id}/basvurular', [EgitimController::class, 'basvurular'])->name('egitimler.basvurular')->whereNumber('id');
+                Route::post('/egitimler/{id}/basvurular/{basvuruId}/durum', [EgitimController::class, 'basvuruDurum'])->name('egitimler.basvuru.durum')->whereNumber('id')->whereNumber('basvuruId');
+                Route::post('/egitimler/{id}/basvurular/{basvuruId}/odeme', [EgitimController::class, 'basvuruOdeme'])->name('egitimler.basvuru.odeme')->whereNumber('id')->whereNumber('basvuruId');
+            });
 
-            Route::get('/sss', [FaqController::class, 'index'])->name('faqs');
-            Route::post('/sss', [FaqController::class, 'store'])->name('faqs.store');
-            Route::put('/sss/{id}', [FaqController::class, 'update'])->name('faqs.update');
-            Route::post('/sss/{id}', [FaqController::class, 'update']);
-            Route::delete('/sss/{id}', [FaqController::class, 'destroy'])->name('faqs.destroy');
-            Route::post('/sss/{id}/toggle', [FaqController::class, 'toggle'])->name('faqs.toggle');
+            Route::middleware('panel.paket:faq')->group(function () {
+                Route::get('/sss', [FaqController::class, 'index'])->name('faqs');
+                Route::post('/sss', [FaqController::class, 'store'])->name('faqs.store');
+                Route::put('/sss/{id}', [FaqController::class, 'update'])->name('faqs.update');
+                Route::post('/sss/{id}', [FaqController::class, 'update']);
+                Route::delete('/sss/{id}', [FaqController::class, 'destroy'])->name('faqs.destroy');
+                Route::post('/sss/{id}/toggle', [FaqController::class, 'toggle'])->name('faqs.toggle');
+            });
 
-            Route::get('/galeri', [GaleriController::class, 'index'])->name('galeri');
-            Route::post('/galeri', [GaleriController::class, 'store'])->name('galeri.store');
-            Route::post('/galeri/sirala', [GaleriController::class, 'sirala'])->name('galeri.sirala');
-            Route::put('/galeri/{id}', [GaleriController::class, 'update'])->name('galeri.update');
-            Route::post('/galeri/{id}', [GaleriController::class, 'update']);
-            Route::post('/galeri/{id}/guncelle', [GaleriController::class, 'update'])->name('galeri.guncelle');
-            Route::delete('/galeri/{id}', [GaleriController::class, 'destroy'])->name('galeri.destroy');
+            Route::middleware('panel.paket:galeri')->group(function () {
+                Route::get('/galeri', [GaleriController::class, 'index'])->name('galeri');
+                Route::post('/galeri', [GaleriController::class, 'store'])->name('galeri.store');
+                Route::post('/galeri/sirala', [GaleriController::class, 'sirala'])->name('galeri.sirala');
+                Route::put('/galeri/{id}', [GaleriController::class, 'update'])->name('galeri.update');
+                Route::post('/galeri/{id}', [GaleriController::class, 'update']);
+                Route::post('/galeri/{id}/guncelle', [GaleriController::class, 'update'])->name('galeri.guncelle');
+                Route::delete('/galeri/{id}', [GaleriController::class, 'destroy'])->name('galeri.destroy');
+            });
 
             Route::get('/yorumlar', [YorumController::class, 'index'])->name('yorumlar');
-            Route::post('/yorumlar/{id}/yanit', [YorumController::class, 'yanit'])->name('yorumlar.yanit');
-            Route::post('/yorumlar/{id}/yanitla', [YorumController::class, 'yanit'])->name('yorumlar.yanitla');
+            Route::middleware('panel.paket:yorum_yanit,yorum')->group(function () {
+                Route::post('/yorumlar/{id}/yanit', [YorumController::class, 'yanit'])->name('yorumlar.yanit');
+                Route::post('/yorumlar/{id}/yanitla', [YorumController::class, 'yanit'])->name('yorumlar.yanitla');
+            });
             Route::put('/yorumlar/{id}/durum', [YorumController::class, 'durum'])->name('yorumlar.durum');
             Route::post('/yorumlar/{id}/durum', [YorumController::class, 'durum']);
 
-            Route::get('/finans', [FinansController::class, 'index'])->name('finans');
-            Route::get('/finans/gelirler', [FinansController::class, 'gelirler'])->name('finans.gelirler');
-            Route::get('/finans/giderler', [FinansController::class, 'giderler'])->name('finans.giderler');
-            Route::get('/finans/kategoriler', [FinansController::class, 'kategoriler'])->name('finans.kategoriler');
-            Route::get('/finans/hasta-bakiyeleri', [FinansController::class, 'hastaBakiyeleri'])->name('finans.hasta-bakiyeleri');
-            Route::get('/finans/hasta/{hastaId}', [FinansController::class, 'hastaHesap'])->name('finans.hasta-hesap')->whereNumber('hastaId');
-            Route::post('/finans/hasta/{hastaId}/tahsilat', [FinansController::class, 'hastaTahsilat'])->name('finans.hasta-tahsilat')->whereNumber('hastaId');
-            Route::post('/finans/hasta/{hastaId}/borc', [FinansController::class, 'hastaBorcEkle'])->name('finans.hasta-borc')->whereNumber('hastaId');
-            Route::get('/finans/rapor/pdf', [FinansController::class, 'raporPdf'])->name('finans.rapor-pdf');
-            Route::post('/finans/gelirler', [FinansController::class, 'storeGelir'])->name('finans.gelir.store');
-            Route::post('/finans/gelirler/store', [FinansController::class, 'storeGelir'])->name('finans.gelirler.store');
-            Route::post('/finans/gelirler/{id}/guncelle', [FinansController::class, 'updateGelir'])->name('finans.gelirler.update');
-            Route::post('/finans/gelirler/{id}/kalem', [FinansController::class, 'storeKalem'])->name('finans.gelirler.kalem.store');
-            Route::delete('/finans/gelirler/{odemeId}/kalem/{kalemId}', [FinansController::class, 'destroyKalem'])->name('finans.gelirler.kalem.destroy');
-            Route::post('/finans/gelirler/{odemeId}/kalem/{kalemId}/sil', [FinansController::class, 'destroyKalem']);
-            Route::delete('/finans/gelirler/{id}', [FinansController::class, 'destroyGelir'])->name('finans.gelir.destroy');
-            Route::delete('/finans/gelirler/{id}/sil', [FinansController::class, 'destroyGelir'])->name('finans.gelirler.destroy');
-            Route::post('/finans/gelirler/{id}/sil', [FinansController::class, 'destroyGelir']);
-            Route::post('/finans/giderler', [FinansController::class, 'storeGider'])->name('finans.gider.store');
-            Route::post('/finans/giderler/store', [FinansController::class, 'storeGider'])->name('finans.giderler.store');
-            Route::post('/finans/giderler/{id}/guncelle', [FinansController::class, 'updateGider'])->name('finans.giderler.update');
-            Route::delete('/finans/giderler/{id}', [FinansController::class, 'destroyGider'])->name('finans.gider.destroy');
-            Route::delete('/finans/giderler/{id}/sil', [FinansController::class, 'destroyGider'])->name('finans.giderler.destroy');
-            Route::post('/finans/giderler/{id}/sil', [FinansController::class, 'destroyGider']);
-            Route::post('/finans/kategoriler', [FinansController::class, 'storeKategori'])->name('finans.kategori.store');
-            Route::post('/finans/kategoriler/store', [FinansController::class, 'storeKategori'])->name('finans.kategoriler.store');
-            Route::post('/finans/kategoriler/{id}/guncelle', [FinansController::class, 'updateKategori'])->name('finans.kategoriler.update');
-            Route::post('/finans/kategoriler/{id}/toggle', [FinansController::class, 'toggleKategori'])->name('finans.kategoriler.toggle');
-            Route::delete('/finans/kategoriler/{id}', [FinansController::class, 'destroyKategori'])->name('finans.kategori.destroy');
-            Route::delete('/finans/kategoriler/{id}/sil', [FinansController::class, 'destroyKategori'])->name('finans.kategoriler.destroy');
-            Route::post('/finans/kategoriler/{id}/sil', [FinansController::class, 'destroyKategori']);
+            Route::middleware('panel.paket:finans')->group(function () {
+                Route::get('/finans', [FinansController::class, 'index'])->name('finans');
+                Route::get('/finans/gelirler', [FinansController::class, 'gelirler'])->name('finans.gelirler');
+                Route::get('/finans/giderler', [FinansController::class, 'giderler'])->name('finans.giderler');
+                Route::get('/finans/kategoriler', [FinansController::class, 'kategoriler'])->name('finans.kategoriler');
+                Route::post('/finans/gelirler', [FinansController::class, 'storeGelir'])->name('finans.gelir.store');
+                Route::post('/finans/gelirler/store', [FinansController::class, 'storeGelir'])->name('finans.gelirler.store');
+                Route::post('/finans/gelirler/{id}/guncelle', [FinansController::class, 'updateGelir'])->name('finans.gelirler.update');
+                Route::post('/finans/gelirler/{id}/kalem', [FinansController::class, 'storeKalem'])->name('finans.gelirler.kalem.store');
+                Route::delete('/finans/gelirler/{odemeId}/kalem/{kalemId}', [FinansController::class, 'destroyKalem'])->name('finans.gelirler.kalem.destroy');
+                Route::post('/finans/gelirler/{odemeId}/kalem/{kalemId}/sil', [FinansController::class, 'destroyKalem']);
+                Route::delete('/finans/gelirler/{id}', [FinansController::class, 'destroyGelir'])->name('finans.gelir.destroy');
+                Route::delete('/finans/gelirler/{id}/sil', [FinansController::class, 'destroyGelir'])->name('finans.gelirler.destroy');
+                Route::post('/finans/gelirler/{id}/sil', [FinansController::class, 'destroyGelir']);
+                Route::post('/finans/giderler', [FinansController::class, 'storeGider'])->name('finans.gider.store');
+                Route::post('/finans/giderler/store', [FinansController::class, 'storeGider'])->name('finans.giderler.store');
+                Route::post('/finans/giderler/{id}/guncelle', [FinansController::class, 'updateGider'])->name('finans.giderler.update');
+                Route::delete('/finans/giderler/{id}', [FinansController::class, 'destroyGider'])->name('finans.gider.destroy');
+                Route::delete('/finans/giderler/{id}/sil', [FinansController::class, 'destroyGider'])->name('finans.giderler.destroy');
+            });
+            Route::middleware('panel.paket:hasta_bakiyeleri')->group(function () {
+                Route::get('/finans/hasta-bakiyeleri', [FinansController::class, 'hastaBakiyeleri'])->name('finans.hasta-bakiyeleri');
+                Route::get('/finans/hasta/{hastaId}', [FinansController::class, 'hastaHesap'])->name('finans.hasta-hesap')->whereNumber('hastaId');
+                Route::post('/finans/hasta/{hastaId}/tahsilat', [FinansController::class, 'hastaTahsilat'])->name('finans.hasta-tahsilat')->whereNumber('hastaId');
+                Route::post('/finans/hasta/{hastaId}/borc', [FinansController::class, 'hastaBorcEkle'])->name('finans.hasta-borc')->whereNumber('hastaId');
+            });
+            Route::middleware('panel.paket:finans_rapor')->get('/finans/rapor/pdf', [FinansController::class, 'raporPdf'])->name('finans.rapor-pdf');
+            Route::middleware('panel.paket:finans')->group(function () {
+                Route::post('/finans/giderler/{id}/sil', [FinansController::class, 'destroyGider']);
+                Route::post('/finans/kategoriler', [FinansController::class, 'storeKategori'])->name('finans.kategori.store');
+                Route::post('/finans/kategoriler/store', [FinansController::class, 'storeKategori'])->name('finans.kategoriler.store');
+                Route::post('/finans/kategoriler/{id}/guncelle', [FinansController::class, 'updateKategori'])->name('finans.kategoriler.update');
+                Route::post('/finans/kategoriler/{id}/toggle', [FinansController::class, 'toggleKategori'])->name('finans.kategoriler.toggle');
+                Route::delete('/finans/kategoriler/{id}', [FinansController::class, 'destroyKategori'])->name('finans.kategori.destroy');
+                Route::delete('/finans/kategoriler/{id}/sil', [FinansController::class, 'destroyKategori'])->name('finans.kategoriler.destroy');
+                Route::post('/finans/kategoriler/{id}/sil', [FinansController::class, 'destroyKategori']);
+            });
         });
     });
 });

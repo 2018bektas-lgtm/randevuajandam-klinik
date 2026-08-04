@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ApiConfigService;
 use App\Services\PlatformApiClient;
 use App\Support\ApiData;
+use App\Support\PaketOzellik;
 use RuntimeException;
 
 class DashboardController extends Controller
@@ -38,10 +39,11 @@ class DashboardController extends Controller
         }
 
         try {
+            PaketOzellik::refreshFromApi($this->api);
             $res = $this->api->get('/dashboard');
             $data = $res['data'] ?? [];
             if (! empty($data['doktor'])) {
-                $user = array_merge($this->api->user() ?? [], $data['doktor']);
+                $user = PaketOzellik::mergeIntoUser(array_merge($this->api->user() ?? [], $data['doktor']));
                 $this->api->setUser($user);
             }
         } catch (RuntimeException $e) {

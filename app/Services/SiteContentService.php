@@ -115,6 +115,7 @@ class SiteContentService
             'yorumlar' => [],
             'ozellikler' => [],
             'surec' => [],
+            'features' => [],
             'api_synced' => false,
         ];
     }
@@ -124,6 +125,8 @@ class SiteContentService
         $out = $this->emptySkeleton();
         $out['api_synced'] = true;
         $out['id'] = $profile['id'] ?? null;
+        $features = $profile['features'] ?? $profile['paket_ozellikleri'] ?? $content['features'] ?? [];
+        $out['features'] = is_array($features) ? array_values(array_filter(array_map('strval', $features))) : [];
         $out['klinik_adi'] = (string) ($profile['ad'] ?? 'Klinik');
         $out['ad_soyad'] = $out['klinik_adi']; // layout brand
         $out['unvan'] = '';

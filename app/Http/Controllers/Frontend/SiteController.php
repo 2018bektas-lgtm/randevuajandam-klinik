@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Services\SiteContentService;
+use App\Support\PaketOzellik;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -44,6 +45,14 @@ class SiteController extends Controller
         return theme_view('pages.'.$page, $data, current_theme_id($doktor));
     }
 
+    protected function requireFeature(string $code): void
+    {
+        $doktor = $this->doktor();
+        if (! PaketOzellik::contentHas($doktor, $code)) {
+            abort(404);
+        }
+    }
+
     public function anasayfa(): View
     {
         return $this->themePage('anasayfa');
@@ -51,6 +60,7 @@ class SiteController extends Controller
 
     public function hakkimda(): View
     {
+        // Klinik hakkında sayfası vitrin çekirdeği (hekim özgeçmişi gibi opsiyonel değil)
         return $this->themePage('hakkimda');
     }
 
@@ -96,16 +106,21 @@ class SiteController extends Controller
 
     public function galeri(): View
     {
+        $this->requireFeature('galeri');
+
         return $this->themePage('galeri');
     }
 
     public function blog(): View
     {
+        $this->requireFeature('blog');
+
         return $this->themePage('blog');
     }
 
     public function blogDetay(string $slug): View
     {
+        $this->requireFeature('blog');
         $doktor = $this->doktor();
         $yazi = collect($doktor['bloglar'] ?? [])->firstWhere('slug', $slug);
         abort_if(! $yazi, 404);
@@ -118,6 +133,8 @@ class SiteController extends Controller
 
     public function sss(): View
     {
+        $this->requireFeature('faq');
+
         return $this->themePage('sss');
     }
 

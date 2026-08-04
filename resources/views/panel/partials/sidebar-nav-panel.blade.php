@@ -1,4 +1,10 @@
 @php
+    use App\Support\PaketOzellik;
+
+    $has = fn (string ...$codes) => PaketOzellik::has(count($codes) === 1 ? $codes[0] : $codes);
+    $paketUyari = route('panel.dashboard');
+    $upgrade = PaketOzellik::upgradeUrl();
+
     $ysbDash = [
         'href' => route('panel.dashboard'),
         'match' => 'panel.dashboard',
@@ -12,10 +18,12 @@
             'label' => 'Hekim · Randevu',
             'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
             'items' => [
-                ['href' => route('panel.randevular'), 'match' => 'panel.randevular', 'label' => 'Takvimim'],
-                ['href' => route('panel.randevular.talepler'), 'match' => 'panel.randevular.talepler', 'label' => 'Randevu Talepleri'],
-                ['href' => route('panel.hastalar'), 'match' => 'panel.hastalar', 'label' => 'Hasta Kayitlari'],
-                ['href' => route('panel.randevu-ayarlari'), 'match' => 'panel.randevu-ayarlari*', 'label' => 'Randevu Ayarlari'],
+                ['href' => $has('online_takvim') ? route('panel.randevular') : $paketUyari, 'match' => 'panel.randevular', 'label' => 'Takvimim', 'locked' => ! $has('online_takvim')],
+                ['href' => $has('randevu_talepleri', 'randevu_talebi_goruntule') ? route('panel.randevular.talepler') : $paketUyari, 'match' => 'panel.randevular.talepler', 'label' => 'Randevu Talepleri', 'locked' => ! $has('randevu_talepleri', 'randevu_talebi_goruntule')],
+                ['href' => $has('bekleme_listesi') ? route('panel.bekleme') : $paketUyari, 'match' => 'panel.bekleme*', 'label' => 'Bekleme Listesi', 'locked' => ! $has('bekleme_listesi')],
+                ['href' => $has('hasta_kartlari') ? route('panel.hastalar') : $paketUyari, 'match' => 'panel.hastalar*', 'label' => 'Hasta Kayitlari', 'locked' => ! $has('hasta_kartlari')],
+                ['href' => $has('onam_formu') ? route('panel.onam.index') : $paketUyari, 'match' => 'panel.onam.*', 'label' => 'Onam Formlari', 'locked' => ! $has('onam_formu')],
+                ['href' => $has('online_takvim') ? route('panel.randevu-ayarlari') : $paketUyari, 'match' => 'panel.randevu-ayarlari*', 'label' => 'Randevu Ayarlari', 'locked' => ! $has('online_takvim')],
             ],
         ],
         [
@@ -24,13 +32,13 @@
             'icon' => 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z',
             'items' => [
                 ['href' => route('panel.hizmetler'), 'match' => 'panel.hizmetler*', 'label' => 'Hizmet ve Tedaviler'],
-                ['href' => route('panel.bloglar'), 'match' => 'panel.bloglar*', 'label' => 'Blog'],
-                ['href' => route('panel.egitimler.index'), 'match' => 'panel.egitimler.index|panel.egitimler.create|panel.egitimler.edit', 'label' => 'Egitimler'],
-                ['href' => route('panel.egitimler.basvurular.tumu'), 'match' => 'panel.egitimler.basvurular*|panel.egitimler.basvuru.*', 'label' => 'Egitim basvurulari'],
+                ['href' => $has('blog') ? route('panel.bloglar') : $paketUyari, 'match' => 'panel.bloglar*', 'label' => 'Blog', 'locked' => ! $has('blog')],
+                ['href' => $has('egitimler') ? route('panel.egitimler.index') : $paketUyari, 'match' => 'panel.egitimler.index|panel.egitimler.create|panel.egitimler.edit', 'label' => 'Egitimler', 'locked' => ! $has('egitimler')],
+                ['href' => $has('egitimler') ? route('panel.egitimler.basvurular.tumu') : $paketUyari, 'match' => 'panel.egitimler.basvurular*|panel.egitimler.basvuru.*', 'label' => 'Egitim basvurulari', 'locked' => ! $has('egitimler')],
                 ['href' => route('panel.yorumlar'), 'match' => 'panel.yorumlar*', 'label' => 'Yorumlar'],
-                ['href' => route('panel.faqs'), 'match' => 'panel.faqs*', 'label' => 'SSS'],
-                ['href' => route('panel.galeri'), 'match' => 'panel.galeri*', 'label' => 'Galeri'],
-                ['href' => route('panel.hakkimda'), 'match' => 'panel.hakkimda*', 'label' => 'Hakkimda'],
+                ['href' => $has('faq') ? route('panel.faqs') : $paketUyari, 'match' => 'panel.faqs*', 'label' => 'SSS', 'locked' => ! $has('faq')],
+                ['href' => $has('galeri') ? route('panel.galeri') : $paketUyari, 'match' => 'panel.galeri*', 'label' => 'Galeri', 'locked' => ! $has('galeri')],
+                ['href' => $has('hakkimda') ? route('panel.hakkimda') : $paketUyari, 'match' => 'panel.hakkimda*', 'label' => 'Hakkimda', 'locked' => ! $has('hakkimda')],
             ],
         ],
         [
@@ -38,11 +46,11 @@
             'label' => 'Hekim · Finans',
             'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
             'items' => [
-                ['href' => route('panel.finans'), 'match' => 'panel.finans', 'label' => 'Genel Bakis'],
-                ['href' => route('panel.finans.gelirler'), 'match' => 'panel.finans.gelirler', 'label' => 'Gelirler'],
-                ['href' => route('panel.finans.giderler'), 'match' => 'panel.finans.giderler', 'label' => 'Giderler'],
-                ['href' => route('panel.finans.hasta-bakiyeleri'), 'match' => 'panel.finans.hasta-bakiyeleri', 'label' => 'Hasta Bakiyeleri'],
-                ['href' => route('panel.finans.kategoriler'), 'match' => 'panel.finans.kategoriler', 'label' => 'Kategoriler'],
+                ['href' => $has('finans') ? route('panel.finans') : $paketUyari, 'match' => 'panel.finans', 'label' => 'Genel Bakis', 'locked' => ! $has('finans')],
+                ['href' => $has('finans') ? route('panel.finans.gelirler') : $paketUyari, 'match' => 'panel.finans.gelirler', 'label' => 'Gelirler', 'locked' => ! $has('finans')],
+                ['href' => $has('finans') ? route('panel.finans.giderler') : $paketUyari, 'match' => 'panel.finans.giderler', 'label' => 'Giderler', 'locked' => ! $has('finans')],
+                ['href' => $has('hasta_bakiyeleri') ? route('panel.finans.hasta-bakiyeleri') : $paketUyari, 'match' => 'panel.finans.hasta-bakiyeleri', 'label' => 'Hasta Bakiyeleri', 'locked' => ! $has('hasta_bakiyeleri')],
+                ['href' => $has('finans') ? route('panel.finans.kategoriler') : $paketUyari, 'match' => 'panel.finans.kategoriler', 'label' => 'Kategoriler', 'locked' => ! $has('finans')],
             ],
         ],
         [
@@ -76,6 +84,9 @@
     $ysbSectionLabel = 'Menu';
     $ysbExtraHtml = '<a href="'.e(route('frontend.anasayfa')).'" target="_blank" class="ysb-dash" style="margin-top:.25rem">'
         .'<span class="ysb-dash-text"><span class="ysb-dash-title">Public siteyi ac</span>'
-        .'<span class="ysb-dash-sub">Yeni sekme</span></span></a>';
+        .'<span class="ysb-dash-sub">Yeni sekme</span></span></a>'
+        .'<a href="'.e($upgrade).'" target="_blank" class="ysb-dash" style="margin-top:.25rem">'
+        .'<span class="ysb-dash-text"><span class="ysb-dash-title">Paket yukselt</span>'
+        .'<span class="ysb-dash-sub">Ana platform</span></span></a>';
 @endphp
 @include('panel.partials.sidebar-ysb-nav')

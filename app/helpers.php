@@ -290,6 +290,18 @@ if (! function_exists('site_nav')) {
         $nav = [
             ['href' => route('frontend.anasayfa'), 'label' => 'Ana Sayfa', 'match' => 'frontend.anasayfa', 'external' => false, 'children' => []],
         ];
+
+        $feats = $doktor['features'] ?? [];
+        $feat = function (string $kod) use ($feats): bool {
+            // features boşsa (cache/eski API) menüyü kapatma
+            if (! is_array($feats) || $feats === []) {
+                return true;
+            }
+
+            return in_array($kod, $feats, true);
+        };
+
+        // Klinik hakkında = vitrin çekirdeği (paket kilidi yok)
         if (\Illuminate\Support\Facades\Route::has('frontend.hakkimda')) {
             $nav[] = ['href' => route('frontend.hakkimda'), 'label' => 'Hakkımızda', 'match' => 'frontend.hakkimda', 'external' => false, 'children' => []];
         }
@@ -299,13 +311,14 @@ if (! function_exists('site_nav')) {
         if (\Illuminate\Support\Facades\Route::has('frontend.hizmetler')) {
             $nav[] = ['href' => route('frontend.hizmetler'), 'label' => 'Hizmetler', 'match' => 'frontend.hizmet*', 'external' => false, 'children' => []];
         }
-        if (\Illuminate\Support\Facades\Route::has('frontend.galeri')) {
+        // API paket filtresi boş içerik döner → menüde gizle
+        if (\Illuminate\Support\Facades\Route::has('frontend.galeri') && $feat('galeri') && ! empty($doktor['galeri'])) {
             $nav[] = ['href' => route('frontend.galeri'), 'label' => 'Galeri', 'match' => 'frontend.galeri', 'external' => false, 'children' => []];
         }
-        if (\Illuminate\Support\Facades\Route::has('frontend.blog')) {
+        if (\Illuminate\Support\Facades\Route::has('frontend.blog') && $feat('blog') && ! empty($doktor['bloglar'])) {
             $nav[] = ['href' => route('frontend.blog'), 'label' => 'Blog', 'match' => 'frontend.blog*', 'external' => false, 'children' => []];
         }
-        if (\Illuminate\Support\Facades\Route::has('frontend.sss')) {
+        if (\Illuminate\Support\Facades\Route::has('frontend.sss') && $feat('faq') && ! empty($doktor['sss'])) {
             $nav[] = ['href' => route('frontend.sss'), 'label' => 'S.S.S.', 'match' => 'frontend.sss', 'external' => false, 'children' => []];
         }
         if (\Illuminate\Support\Facades\Route::has('frontend.iletisim')) {

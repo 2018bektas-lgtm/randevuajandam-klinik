@@ -104,7 +104,7 @@ class AuthController extends Controller
                     }
 
                     $this->api->setToken($token);
-                    $this->api->setUser($d);
+                    $this->api->setUser(\App\Support\PaketOzellik::mergeIntoUser($d));
                     $apiOk = true;
                 }
             } catch (RuntimeException $e) {
@@ -164,7 +164,8 @@ class AuthController extends Controller
                 ->with('basari', 'Yerel oturum açıldı. Hekim işlemleri (randevu, hasta, finans) için platform hekim hesabıyla giriş yapın.');
         }
 
-        $d = is_array($doktor) ? $doktor : (array) $doktor;
+        $d = \App\Support\PaketOzellik::mergeIntoUser(is_array($doktor) ? $doktor : (array) $doktor);
+        $this->api->setUser($d);
         session([
             'panel_auth' => [
                 'mode' => 'api',

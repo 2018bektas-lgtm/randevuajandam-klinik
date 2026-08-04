@@ -57,7 +57,7 @@ class TwoFactorController extends Controller
 
         $request->session()->forget(['two_factor.challenge_token', 'two_factor.email', 'two_factor.expected_doktor_id']);
         $this->api->setToken($token);
-        $this->api->setUser($d);
+        $this->api->setUser(\App\Support\PaketOzellik::mergeIntoUser($d));
 
         session([
             'panel_auth' => [
