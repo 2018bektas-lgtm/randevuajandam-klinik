@@ -237,5 +237,6 @@
     };
 </script>
 @stack('scripts')
+@include('panel.partials.asistan_widget')
 </body>
 </html>
