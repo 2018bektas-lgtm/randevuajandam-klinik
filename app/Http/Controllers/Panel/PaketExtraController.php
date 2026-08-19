@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Services\PlatformApiClient;
 use App\Support\ApiData;
-use App\Support\PaketOzellik;
 use Illuminate\Http\Request;
 use RuntimeException;
 
 /**
- * Ana site ile parity: bekleme, onam, hasta detay/export/dosya, iCal.
+ * Ana site ile parity: bekleme, hasta detay/export, iCal.
+ * (KTS/USBS kapsam disi kalmak icin: hasta dosya + onam modulleri kaldirildi.)
  */
 class PaketExtraController extends Controller
 {
@@ -103,106 +103,10 @@ class PaketExtraController extends Controller
         try {
             $res = $this->api->get('/hastalar/'.$id);
             $hasta = $res['data'] ?? [];
-            $dosyalar = [];
-            if (PaketOzellik::has('hasta_not_dosya')) {
-                try {
-                    $d = $this->api->get('/hastalar/'.$id.'/dosyalar');
-                    $dosyalar = $d['data'] ?? [];
-                } catch (\Throwable) {
-                }
-            }
-            $onamFormlar = [];
-            if (PaketOzellik::has('onam_formu')) {
-                try {
-                    $o = $this->api->get('/onam-formlari');
-                    $onamFormlar = $o['data'] ?? [];
-                } catch (\Throwable) {
-                }
-            }
         } catch (RuntimeException $e) {
             return redirect()->route('panel.hastalar')->with('hata', $e->getMessage());
         }
 
-        return view('panel.paket.hasta_detay', compact('hasta', 'dosyalar', 'onamFormlar', 'id'));
-    }
-
-    public function hastaDosyaYukle(Request $request, int $id)
-    {
-        $request->validate(['dosya' => 'required|file|max:10240']);
-        try {
-            $this->api->postMultipart('/hastalar/'.$id.'/dosyalar', [
-                'baslik' => $request->input('baslik'),
-                'not' => $request->input('not'),
-            ], ['dosya' => $request->file('dosya')]);
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return back()->with('basari', 'Dosya yüklendi.');
-    }
-
-    public function hastaDosyaSil(int $id)
-    {
-        try {
-            $this->api->delete('/hastalar/dosyalar/'.$id);
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return back()->with('basari', 'Dosya silindi.');
-    }
-
-    public function onamIndex()
-    {
-        try {
-            $res = $this->api->get('/onam-formlari');
-            $formlar = $res['data'] ?? [];
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return view('panel.paket.onam', compact('formlar'));
-    }
-
-    public function onamStore(Request $request)
-    {
-        $data = $request->validate([
-            'baslik' => 'required|string|max:255',
-            'icerik' => 'required|string',
-        ]);
-        try {
-            $this->api->post('/onam-formlari', array_merge($data, ['aktif_mi' => true]));
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return back()->with('basari', 'Onam formu eklendi.');
-    }
-
-    public function onamDestroy(int $id)
-    {
-        try {
-            $this->api->delete('/onam-formlari/'.$id);
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return back()->with('basari', 'Silindi.');
-    }
-
-    public function onamImza(Request $request)
-    {
-        $data = $request->validate([
-            'onam_form_id' => 'required|integer',
-            'hasta_id' => 'required|integer',
-            'not' => 'nullable|string|max:1000',
-        ]);
-        try {
-            $this->api->post('/onam-formlari/imza', $data);
-        } catch (RuntimeException $e) {
-            return back()->with('hata', $e->getMessage());
-        }
-
-        return back()->with('basari', 'Onam kaydı oluşturuldu.');
+        return view('panel.paket.hasta_detay', compact('hasta', 'id'));
     }
 }

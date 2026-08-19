@@ -112,8 +112,11 @@
             </div>
             <div><div class="text-[10px] font-bold uppercase text-slate-400">Hasta notu</div><div id="evNot" class="text-xs italic text-slate-600"></div></div>
             <div>
-                <label class="text-[10px] font-bold uppercase text-slate-400">Hekim notu / açıklama</label>
-                <textarea id="evHekimNotu" rows="2" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"></textarea>
+                <label class="text-[10px] font-bold uppercase text-slate-400">
+                    Randevu notu
+                    <span class="text-[9px] normal-case text-slate-400">(organizasyonel — tıbbi bilgi girmeyiniz)</span>
+                </label>
+                <textarea id="evAciklama" rows="2" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"></textarea>
             </div>
         </div>
         <div id="evActions" class="px-6 py-4 bg-slate-50 border-t flex flex-wrap gap-2 justify-end"></div>
@@ -325,7 +328,7 @@
         document.getElementById('evHizmet').textContent = props.hizmet_ad || '—';
         document.getElementById('evDurum').textContent = props.durum || '—';
         document.getElementById('evNot').textContent = props.not || 'Belirtilmedi';
-        document.getElementById('evHekimNotu').value = props.hekim_notu || props.not || '';
+        document.getElementById('evAciklama').value = props.not || '';
         const gorusmeTipi = props.gorusme_tipi || 'yuz_yuze';
         const gorusmeEl = document.getElementById('evGorusmeTipi');
         if (gorusmeEl) {
@@ -337,13 +340,12 @@
         const joinBox = document.getElementById('evOnlineJoin');
         const joinLink = document.getElementById('evJoinLink');
         if (joinBox && joinLink) {
-            const rid = props.randevu_id || (ev.id && String(ev.id).replace(/^randevu_/, ''));
-            const localJoin = rid ? @json(url('/yonetim/gorusme')).replace(/\/?$/, '/') + rid : null;
-            const hekimJoin = props.hekim_join_url || localJoin;
-            if (gorusmeTipi === 'online' && hekimJoin && props.durum === 'onaylandi') {
+            const meetingUrl = props.meeting_url || null;
+            if (gorusmeTipi === 'online' && meetingUrl && props.durum === 'onaylandi') {
                 joinBox.classList.remove('hidden');
-                joinLink.href = localJoin || hekimJoin;
-                joinLink.removeAttribute('target');
+                joinLink.href = meetingUrl;
+                joinLink.target = '_blank';
+                joinLink.rel = 'noopener noreferrer';
             } else {
                 joinBox.classList.add('hidden');
             }
@@ -407,13 +409,11 @@
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify({
                     hizmet_id,
-                    aciklama: document.getElementById('evHekimNotu').value
+                    aciklama: document.getElementById('evAciklama').value
                 })
             });
             const j = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(j.message || 'Güncellenemedi');
-            // also save hekim note via durum endpoint
-            await updateDurum(id, currentEventProps?.durum || 'beklemede');
             toast(j.message || 'Güncellendi', true);
             closeEventModal();
             calendar.refetchEvents();
@@ -425,7 +425,6 @@
         body.append('_token', csrf);
         body.append('_method', 'PUT');
         body.append('durum', durum);
-        body.append('hekim_notu', document.getElementById('evHekimNotu').value);
         try {
             const res = await fetch(routes.durum.replace('__ID__', id), {
                 method: 'POST', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, body

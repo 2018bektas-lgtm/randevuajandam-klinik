@@ -9,7 +9,6 @@ use App\Http\Controllers\Panel\EgitimController;
 use App\Http\Controllers\Panel\FaqController;
 use App\Http\Controllers\Panel\FinansController;
 use App\Http\Controllers\Panel\GaleriController;
-use App\Http\Controllers\Panel\GorusmeController;
 use App\Http\Controllers\Panel\HizmetController;
 use App\Http\Controllers\Panel\ProfilController;
 use App\Http\Controllers\Panel\RandevuController;
@@ -153,8 +152,6 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
             Route::post('/2fa/kapat', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
             Route::post('/2fa/yedek-kodlar', [TwoFactorController::class, 'regenerateRecovery'])->name('two-factor.recovery');
 
-            Route::middleware('panel.paket:online_gorusme')->get('/gorusme/{id}', [GorusmeController::class, 'join'])->whereNumber('id')->name('gorusme.join');
-
             Route::middleware('panel.paket:online_takvim')->group(function () {
                 Route::get('/randevular', [RandevuController::class, 'index'])->name('randevular');
                 Route::get('/randevular/events', [RandevuController::class, 'events'])->name('randevular.events');
@@ -184,10 +181,6 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
                 Route::get('/hastalar', [RandevuController::class, 'hastalar'])->name('hastalar');
                 Route::get('/hastalar/{id}', [PaketExtraController::class, 'hastaDetay'])->name('hastalar.detay')->whereNumber('id');
                 Route::middleware('panel.paket:hasta_export')->get('/hastalar-export', [PaketExtraController::class, 'hastaExport'])->name('hastalar.export');
-                Route::middleware('panel.paket:hasta_not_dosya')->group(function () {
-                    Route::post('/hastalar/{id}/dosya', [PaketExtraController::class, 'hastaDosyaYukle'])->name('hastalar.dosya')->whereNumber('id');
-                    Route::delete('/hastalar/dosya/{id}', [PaketExtraController::class, 'hastaDosyaSil'])->name('hastalar.dosya.sil')->whereNumber('id');
-                });
             });
             Route::middleware('panel.paket:bekleme_listesi')->group(function () {
                 Route::get('/bekleme-listesi', [PaketExtraController::class, 'bekleme'])->name('bekleme');
@@ -196,12 +189,6 @@ Route::prefix('yonetim')->name('panel.')->group(function () {
                 Route::delete('/bekleme-listesi/{id}', [PaketExtraController::class, 'beklemeSil'])->name('bekleme.sil')->whereNumber('id');
             });
             Route::middleware('panel.paket:ical_export')->get('/takvim/ical', [PaketExtraController::class, 'ical'])->name('randevular.ical');
-            Route::middleware('panel.paket:onam_formu')->group(function () {
-                Route::get('/onam-formlari', [PaketExtraController::class, 'onamIndex'])->name('onam.index');
-                Route::post('/onam-formlari', [PaketExtraController::class, 'onamStore'])->name('onam.store');
-                Route::delete('/onam-formlari/{id}', [PaketExtraController::class, 'onamDestroy'])->name('onam.destroy')->whereNumber('id');
-                Route::post('/onam-formlari/imza', [PaketExtraController::class, 'onamImza'])->name('onam.imza');
-            });
             Route::middleware('panel.paket:hizli_slot')->group(function () {
                 Route::get('/randevu/hizli-kapat-slotlar', [RandevuController::class, 'hizliKapatSlots'])->name('randevu.hizli-kapat-slotlar');
                 Route::post('/randevu/hizli-kapat', [RandevuController::class, 'hizliKapatKaydet'])->name('randevu.hizli-kapat');

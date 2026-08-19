@@ -264,10 +264,8 @@ class RandevuController extends Controller
                 'saat' => $r['saat'] ?? '',
                 'durum' => $r['durum'] ?? '',
                 'not' => $r['not'] ?? '',
-                'hekim_notu' => $r['hekim_notu'] ?? '',
                 'gorusme_tipi' => $r['gorusme_tipi'] ?? 'yuz_yuze',
-                'platform_join_url' => $r['platform_join_url'] ?? null,
-                'can_join' => $r['can_join'] ?? false,
+                'meeting_url' => $r['meeting_url'] ?? null,
                 'hizmet' => $hizmet,
             ];
         });
@@ -292,7 +290,6 @@ class RandevuController extends Controller
     {
         $data = $request->validate([
             'durum' => ['required', 'in:beklemede,onaylandi,tamamlandi,iptal'],
-            'hekim_notu' => ['nullable', 'string', 'max:2000'],
         ]);
 
         try {
