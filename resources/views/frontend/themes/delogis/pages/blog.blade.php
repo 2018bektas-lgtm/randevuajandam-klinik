@@ -21,7 +21,7 @@
         <div class="mp-blog-grid">
             @forelse (($doktor['bloglar'] ?? []) as $b)
                 <a href="{{ route('frontend.blog.detay', $b['slug'] ?? '') }}" class="mp-blog-card">
-                    <img src="{{ $b['image'] ?? 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80' }}" alt="" loading="lazy">
+                    <img src="{{ $b['image'] ?? image_placeholder() }}" alt="{{ $b['baslik'] ?? 'Blog yazisi' }}" loading="lazy">
                     <div class="mp-blog-body">
                         @if(!empty($b['tarih']))
                             <div class="mp-blog-date">{{ $b['tarih'] }}</div>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Görsel yer tutucusu">
+  <rect width="1200" height="800" fill="#F1EFEA"/>
+  <g fill="none" stroke="#C9C4B8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="430" y="300" width="340" height="240" rx="18"/>
+    <path d="M430 470l92-88 74 70 66-58 108 106"/>
+    <circle cx="527" cy="366" r="26"/>
+  </g>
+</svg>

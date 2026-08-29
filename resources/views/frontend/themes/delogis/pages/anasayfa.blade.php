@@ -52,16 +52,16 @@
             <div class="item main-slider-three__slide-{{ ($i % 3) + 1 }}">
                 <div class="main-slider-three__bg" style="background-image: url({{ $dg }}/images/backgrounds/main-slider-three-bg.jpg);"></div>
                 <div class="main-slider-three__shape-3 img-bounce">
-                    <img src="{{ $dg }}/images/shapes/main-slider-three-shape-3.png" alt="">
+                    <img src="{{ $dg }}/images/shapes/main-slider-three-shape-3.png" alt="" loading="lazy" decoding="async">
                 </div>
                 <div class="main-slider-three__img">
-                    <img src="{{ $img }}" alt="{{ $title }}" style="max-height:520px;object-fit:contain">
+                    <img src="{{ $img }}" alt="{{ $title }}" style="max-height:520px;object-fit:contain" loading="eager" fetchpriority="high" decoding="async">
                 </div>
                 <div class="main-slider-three__star-one zoominout">
-                    <img src="{{ $dg }}/images/shapes/main-slider-three-star-1.png" alt="">
+                    <img src="{{ $dg }}/images/shapes/main-slider-three-star-1.png" alt="" loading="lazy" decoding="async">
                 </div>
                 <div class="main-slider-three__star-two img-bounce">
-                    <img src="{{ $dg }}/images/shapes/main-slider-three-star-2.png" alt="">
+                    <img src="{{ $dg }}/images/shapes/main-slider-three-star-2.png" alt="" loading="lazy" decoding="async">
                 </div>
                 <div class="container">
                     <div class="main-slider-three__content">
@@ -107,7 +107,7 @@
                     <div class="feature-two__single">
                         <div class="feature-two__img-box">
                             <div class="feature-two__img">
-                                <img src="{{ $hImg }}" alt="{{ $hAd }}">
+                                <img src="{{ $hImg }}" alt="{{ $hAd }}" loading="lazy" decoding="async">
                             </div>
                             <div class="feature-two__title-box">
                                 <h3><a href="{{ $href }}">{{ $hAd }}</a></h3>
@@ -139,7 +139,7 @@
                 <div class="about-three__left wow slideInLeft" data-wow-delay="100ms" data-wow-duration="2500ms">
                     <div class="about-three__img-box">
                         <div class="about-three__img">
-                            <img src="{{ $photo }}" alt="{{ $ad }}" style="border-radius:12px;max-width:100%">
+                            <img src="{{ $photo }}" alt="{{ $ad }}" style="border-radius:12px;max-width:100%" loading="lazy" decoding="async">
                         </div>
                     </div>
                 </div>
@@ -268,7 +268,7 @@
                 <div class="col-xl-4 col-lg-4 wow fadeInUp">
                     <div class="blog-two__single">
                         <div class="blog-two__img">
-                            <img src="{{ $bImg }}" alt="{{ $bTitle }}">
+                            <img src="{{ $bImg }}" alt="{{ $bTitle }}" loading="lazy" decoding="async">
                             <a href="{{ $href }}"><span class="blog-two__plus"></span></a>
                         </div>
                         <div class="blog-two__content">
@@ -286,7 +286,7 @@
 {{-- CTA --}}
 <section class="cta-one">
     <div class="cta-one__shape-1 float-bob-x">
-        <img src="{{ $dg }}/images/shapes/cta-one-shape-1.png" alt="">
+        <img src="{{ $dg }}/images/shapes/cta-one-shape-1.png" alt="" loading="lazy" decoding="async">
     </div>
     <div class="container">
         <div class="cta-one__inner">

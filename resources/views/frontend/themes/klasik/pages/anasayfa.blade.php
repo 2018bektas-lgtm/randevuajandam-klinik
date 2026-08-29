@@ -14,9 +14,9 @@
     $photo = $doktor['logo']
         ?? $doktor['profil_resmi']
         ?? ($doktor['hekimler'][0]['profil_resmi'] ?? null)
-        ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80';
+        ?? image_placeholder();
     $clinicHeroImg = $doktor['galeri'][0]['image']
-        ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=85';
+        ?? image_placeholder();
     $bolum = $doktor['anasayfa_bolumler'] ?? [];
     $basliklar = $doktor['bolum_basliklar'] ?? [];
     $sira = $doktor['anasayfa_sira'] ?? [
@@ -79,7 +79,7 @@
                     'alt' => 'Randevu talebiniz klinik paneline anında düşer; onay sonrası bilgilendirilirsiniz.',
                     'etiket' => 'Randevu',
                     'badge' => '7/24 talep',
-                    'image' => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=85',
+                    'image' => image_placeholder(),
                     'thumb' => $photo,
                     'cta' => 'Randevu Oluştur',
                     'cta_url' => route('frontend.randevu'),
@@ -222,7 +222,7 @@
                                                 </div>
 
                                                 <div class="dn-float dn-float-doctor lx-pill" data-parallax="1">
-                                                    <img src="{{ $docThumb }}" alt="">
+                                                    <img src="{{ $docThumb }}" alt="{{ $klinikAd ?? 'Hekim' }}" loading="lazy" decoding="async">
                                                     <div>
                                                         <strong>{{ $docName }}</strong>
                                                         <span>{{ $docRole }}</span>
@@ -364,7 +364,7 @@
             <section class="section bg-white">
                 <div class="container two-col reveal">
                     <div class="media-frame">
-                        <img src="{{ $clinicHeroImg }}" alt="{{ $doktor['klinik_adi'] ?? $doktor['ad_soyad'] ?? 'Klinik' }}">
+                        <img src="{{ $clinicHeroImg }}" alt="{{ $doktor['klinik_adi'] ?? $doktor['ad_soyad'] ?? 'Klinik' }}" loading="lazy" decoding="async">
                         <div class="media-badge">
                             <strong>{{ $doktor['klinik_adi'] ?? $doktor['ad_soyad'] ?? '' }}</strong>
                             <span>{{ $doktor['uzmanlik'] ?? '' }}@if(!empty($doktor['il'])) · {{ $doktor['il'] }}@endif</span>

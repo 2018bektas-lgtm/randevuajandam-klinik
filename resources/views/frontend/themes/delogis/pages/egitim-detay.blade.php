@@ -30,7 +30,7 @@
     <div class="mp-container" style="display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;align-items:start">
         <div>
             @if(!empty($egitim['image']))
-                <img src="{{ $egitim['image'] }}" alt="" style="width:100%;border-radius:8px;object-fit:cover;max-height:320px;margin-bottom:1.25rem">
+                <img src="{{ $egitim['image'] }}" alt="{{ $egitim['baslik'] ?? 'Egitim' }}" style="width:100%;border-radius:8px;object-fit:cover;max-height:320px;margin-bottom:1.25rem" loading="lazy" decoding="async">
             @endif
             <div class="mp-svc-meta" style="margin-bottom:1rem">
                 <span class="mp-chip">{{ $egitim['tip'] ?? '' }}</span>

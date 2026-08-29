@@ -26,7 +26,7 @@
     <div class="mp-container">
         <div class="mp-about-grid">
             <div class="mp-about-photo">
-                <img src="{{ $hizmet['image'] ?? ($doktor['profil_resmi'] ?? '') }}" alt="{{ $baslik }}">
+                <img src="{{ $hizmet['image'] ?? ($doktor['profil_resmi'] ?? '') }}" alt="{{ $baslik }}" loading="lazy" decoding="async">
             </div>
             <div>
                 <div class="mp-svc-meta" style="margin-bottom:1rem">

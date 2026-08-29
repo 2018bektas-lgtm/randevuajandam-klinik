@@ -5,7 +5,7 @@
 
 @section('icerik')
 @php
-    $photo = $doktor['profil_resmi'] ?? 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=1000&q=80';
+    $photo = $doktor['profil_resmi'] ?? avatar_placeholder(trim((string) ($doktor['unvan'] ?? '').' '.(string) ($doktor['ad_soyad'] ?? '')));
     $hizmetler = collect($doktor['hizmetler'] ?? [])->take(6);
 @endphp
 
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="th-ocean-hero-media">
-            <img src="{{ $photo }}" alt="">
+            <img src="{{ $photo }}" alt="{{ $klinikAd ?? $doktor['klinik_adi'] ?? 'Klinik' }}" loading="eager" fetchpriority="high" decoding="async">
         </div>
     </div>
 </section>

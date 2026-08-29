@@ -34,6 +34,112 @@ if (! function_exists('media_url')) {
     }
 }
 
+if (! function_exists('avatar_placeholder')) {
+    /**
+     * Fotoğrafı olmayan kişi için yerel monogram avatar (inline SVG data URI).
+     *
+     * Daha önce burada Unsplash'ten çekilen bir portre kullanılıyordu; yani
+     * fotoğrafını yüklememiş hekimin yerine YABANCI BİR İNSANIN YÜZÜ
+     * gösteriliyordu. Bu hem güven açısından kabul edilemez hem de her
+     * ziyaretçinin IP'sini üçüncü tarafa sızdırıyordu. Artık dışarıya istek
+     * gitmiyor: isim baş harfleri marka renginde yerel olarak üretiliyor.
+     */
+    function avatar_placeholder(?string $ad = null, int $boyut = 600): string
+    {
+        $ad = trim((string) $ad);
+        $harfler = '';
+        if ($ad !== '') {
+            $parcalar = array_values(array_filter(preg_split('/\s+/u', $ad) ?: []));
+            foreach (array_slice($parcalar, 0, 2) as $p) {
+                $harfler .= mb_strtoupper(mb_substr($p, 0, 1), 'UTF-8');
+            }
+        }
+        if ($harfler === '') {
+            $harfler = '?';
+        }
+
+        $renk = '#9B9A84';
+        if (function_exists('resolve_site_theme')) {
+            $temaRenk = resolve_site_theme()['renk'] ?? null;
+            if (is_string($temaRenk) && preg_match('/^#[0-9A-Fa-f]{6}$/', $temaRenk)) {
+                $renk = $temaRenk;
+            }
+        }
+
+        $boyut = max(64, min(1200, $boyut));
+        $yaziBoyut = (int) round($boyut * 0.34);
+
+        $svg = sprintf(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="%1$d" height="%1$d" viewBox="0 0 %1$d %1$d" role="img" aria-label="%3$s">'
+            .'<rect width="%1$d" height="%1$d" fill="%2$s" opacity="0.16"/>'
+            .'<text x="50%%" y="50%%" dy="0.35em" text-anchor="middle" '
+            .'font-family="Georgia, \'Times New Roman\', serif" font-size="%4$d" fill="%2$s" '
+            .'letter-spacing="%5$d">%3$s</text>'
+            .'</svg>',
+            $boyut,
+            $renk,
+            htmlspecialchars($harfler, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+            $yaziBoyut,
+            (int) round($yaziBoyut * 0.06)
+        );
+
+        return 'data:image/svg+xml;base64,'.base64_encode($svg);
+    }
+}
+
+if (! function_exists('image_placeholder')) {
+    /**
+     * Dekoratif görsel yer tutucusu (slider, galeri, blog kapağı…).
+     *
+     * Yerel dosya; dışarıya istek gitmez. Eskiden bu alanlarda Unsplash
+     * bağlantıları vardı: CDN erişilemezse görsel kırılıyor, erişilebilirse
+     * ziyaretçi IP'si üçüncü tarafa gidiyordu.
+     */
+    function image_placeholder(): string
+    {
+        return asset('images/placeholder.svg');
+    }
+}
+
+if (! function_exists('doctor_photo')) {
+    /**
+     * Hekim profil fotografi — bos string / bozuk yol icin yerel avatar.
+     *
+     * NOT: Bu fonksiyon delogis temasinda (pages/anasayfa, pages/hakkimda)
+     * kullaniliyordu ama bu projede TANIMLI DEGILDI; hakkimda sayfasi
+     * "Call to undefined function doctor_photo()" ile HTTP 500 veriyordu.
+     */
+    function doctor_photo(?array $doktor, ?string $fallback = null): string
+    {
+        $ad = is_array($doktor)
+            ? trim((string) ($doktor['unvan'] ?? '').' '.(string) ($doktor['ad_soyad'] ?? ''))
+            : '';
+
+        $fallback = $fallback ?: avatar_placeholder($ad);
+
+        if (! is_array($doktor)) {
+            return $fallback;
+        }
+
+        foreach (['profil_resmi', 'foto', 'avatar', 'resim', 'logo'] as $key) {
+            $raw = $doktor[$key] ?? null;
+            if (! is_string($raw) && ! is_numeric($raw)) {
+                continue;
+            }
+            $raw = trim((string) $raw);
+            if ($raw === '' || strcasecmp($raw, 'null') === 0) {
+                continue;
+            }
+            $url = media_url($raw);
+            if (is_string($url) && $url !== '') {
+                return $url;
+            }
+        }
+
+        return $fallback;
+    }
+}
+
 if (! function_exists('media_base')) {
     function media_base(): string
     {

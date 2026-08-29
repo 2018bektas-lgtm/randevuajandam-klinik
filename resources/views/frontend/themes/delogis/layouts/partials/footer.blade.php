@@ -19,7 +19,7 @@
 @endphp
 <footer class="site-footer">
     <div class="site-footer__shape-1 float-bob-y">
-        <img src="{{ $dg }}/images/shapes/site-footer-shape-1.png" alt="">
+        <img src="{{ $dg }}/images/shapes/site-footer-shape-1.png" alt="" loading="lazy" decoding="async">
     </div>
     <div class="site-footer__top">
         <div class="container">
@@ -66,7 +66,7 @@
                         <div class="footer-widget__logo">
                             <a href="{{ route('frontend.anasayfa') }}">
                                 @if($logo)
-                                    <img src="{{ $logo }}" alt="{{ $adSoyad }}" style="max-height:48px;width:auto">
+                                    <img src="{{ $logo }}" alt="{{ $adSoyad }}" style="max-height:48px;width:auto" loading="lazy" decoding="async">
                                 @else
                                     <strong style="color:#fff;font-size:1.2rem">{{ $adSoyad }}</strong>
                                 @endif

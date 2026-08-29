@@ -8,10 +8,12 @@
 @endphp
 {{-- Sıcak: modern iskelet + sicak CSS --}}
 <body class="theme-sicak layout-sicak theme-pack-sicak layout-modern">
+    @include('frontend.partials.erisilebilirlik')
+
     @include('frontend.layouts.partials.tracking-body')
     @include('frontend.themes.modern.layouts.partials.header', ['doktor' => $doktor ?? [], 'nav' => $nav])
 
-    <main class="site-main theme-main">
+    <main id="ana-icerik" tabindex="-1" class="site-main theme-main">
         @yield('icerik')
     </main>
 

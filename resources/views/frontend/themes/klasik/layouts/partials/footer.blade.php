@@ -9,7 +9,7 @@
         <div>
             @if(!empty($doktor['logo']))
                 <a href="{{ route('frontend.anasayfa') }}" class="footer-logo-link">
-                    <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd }}" class="footer-logo">
+                    <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd }}" class="footer-logo" loading="lazy" decoding="async">
                 </a>
             @endif
             <div class="footer-brand">{{ $klinikAd }}</div>

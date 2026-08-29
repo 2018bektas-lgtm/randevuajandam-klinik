@@ -188,8 +188,8 @@ class SiteContentService
         })->values()->all();
 
         $fallbackImgs = [
-            'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=900&q=80',
-            'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=900&q=80',
+            image_placeholder(),
+            image_placeholder(),
         ];
         $out['hizmetler'] = collect($services)->values()->map(function ($h, $i) use ($fallbackImgs) {
             $h = is_array($h) ? $h : (array) $h;
@@ -225,7 +225,7 @@ class SiteContentService
                     'tarih' => $b['tarih'] ?? '',
                     'okuma' => max(3, (int) ceil(max(1, str_word_count($plain)) / 180)).' dk',
                     'kategori' => 'Blog',
-                    'image' => $b['resim'] ?? 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1000&q=80',
+                    'image' => $b['resim'] ?? image_placeholder(),
                     'icerik' => array_values(array_filter(array_map('trim', preg_split('/\n\s*\n/', $plain) ?: [$plain]))),
                     'icerik_html' => $b['icerik'] ?? '',
                 ];

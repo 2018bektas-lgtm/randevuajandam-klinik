@@ -27,7 +27,7 @@
     <div class="container" style="display:grid;gap:2rem;grid-template-columns:1fr;max-width:820px;margin-inline:auto">
         @if(!empty($yazi['image']))
             <div class="media-frame">
-                <img src="{{ $yazi['image'] }}" alt="{{ $yazi['baslik'] }}" style="min-height:320px">
+                <img src="{{ $yazi['image'] }}" alt="{{ $yazi['baslik'] }}" style="min-height:320px" loading="lazy" decoding="async">
             </div>
         @endif
         <article class="card card-pad prose">

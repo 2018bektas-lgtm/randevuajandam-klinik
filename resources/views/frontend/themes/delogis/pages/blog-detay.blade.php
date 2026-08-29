@@ -26,7 +26,7 @@
     <div class="mp-container" style="max-width:820px">
         @if(!empty($yazi['image']))
             <div class="mp-about-photo" style="margin-bottom:24px">
-                <img src="{{ $yazi['image'] }}" alt="{{ $yazi['baslik'] ?? '' }}" style="max-height:380px">
+                <img src="{{ $yazi['image'] }}" alt="{{ $yazi['baslik'] ?? '' }}" style="max-height:380px" loading="lazy" decoding="async">
             </div>
         @endif
         <article class="mp-card">

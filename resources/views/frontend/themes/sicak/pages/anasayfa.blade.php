@@ -6,7 +6,7 @@
 @section('icerik')
 @php
     $photo = $doktor['profil_resmi']
-        ?? 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1200&q=80';
+        ?? image_placeholder();
     $hizmetler = collect($doktor['hizmetler'] ?? [])->take(6);
     $bloglar = collect($doktor['bloglar'] ?? [])->take(3);
 @endphp
@@ -59,7 +59,7 @@
 <section class="th-modern-section th-modern-about">
     <div class="container th-modern-about-grid">
         <div class="th-modern-about-photo">
-            <img src="{{ $photo }}" alt="">
+            <img src="{{ $photo }}" alt="{{ $klinikAd ?? $doktor['klinik_adi'] ?? 'Klinik' }}" loading="eager" fetchpriority="high" decoding="async">
         </div>
         <div>
             <p class="th-modern-eyebrow">Hakkımda</p>

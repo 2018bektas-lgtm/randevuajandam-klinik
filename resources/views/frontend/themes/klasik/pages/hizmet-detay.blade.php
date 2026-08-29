@@ -25,7 +25,7 @@
 <section class="section">
     <div class="container two-col" style="align-items:start">
         <div class="media-frame">
-            <img src="{{ $hizmet['image'] ?? ($doktor['profil_resmi'] ?? '') }}" alt="{{ $hizmet['baslik'] ?? 'Hizmet' }}">
+            <img src="{{ $hizmet['image'] ?? ($doktor['profil_resmi'] ?? '') }}" alt="{{ $hizmet['baslik'] ?? 'Hizmet' }}" loading="lazy" decoding="async">
         </div>
         <div>
             <div class="service-meta" style="margin-bottom:1rem">

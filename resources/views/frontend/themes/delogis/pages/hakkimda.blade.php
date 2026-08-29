@@ -34,7 +34,7 @@
                      height="640"
                      loading="eager"
                      decoding="async"
-                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1000&q=80';">
+                     onerror="this.onerror=null;this.src='{{ image_placeholder() }}';">
             </div>
             <div>
                 <span class="mp-eyebrow" style="color:var(--mp-blue);font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase">Özgeçmiş</span>

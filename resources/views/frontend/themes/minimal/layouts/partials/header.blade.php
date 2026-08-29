@@ -8,7 +8,7 @@
     <div class="container th-min-inner">
         <a href="{{ route('frontend.anasayfa') }}" class="th-min-brand">
             @if(!empty($doktor['logo']))
-                <img src="{{ $doktor['logo'] }}" alt="" class="th-min-logo">
+                <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd ?? $doktor['klinik_adi'] ?? 'Klinik' }}" class="th-min-logo" loading="lazy" decoding="async">
             @endif
             <span class="th-min-name">{{ trim(($doktor['unvan'] ?? '').' '.($doktor['ad_soyad'] ?? 'Hekim')) }}</span>
             <span class="th-min-role">{{ $doktor['uzmanlik'] ?? '' }}</span>

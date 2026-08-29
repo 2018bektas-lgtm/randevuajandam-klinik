@@ -64,7 +64,7 @@
     <div class="header-inner">
         <a href="{{ route('frontend.anasayfa') }}" class="brand {{ !empty($doktor['logo']) ? 'has-logo' : '' }}">
             @if(!empty($doktor['logo']))
-                <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd }}" class="brand-logo">
+                <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd }}" class="brand-logo" loading="lazy" decoding="async">
             @else
                 <span class="brand-mark">{{ mb_substr($klinikAd, 0, 1) }}</span>
             @endif

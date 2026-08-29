@@ -22,7 +22,7 @@
 <section class="section">
     <div class="container two-col" style="align-items:start">
         <div class="media-frame">
-            <img src="{{ $hekim['profil_resmi'] ?? 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=900&q=80' }}"
+            <img src="{{ $hekim['profil_resmi'] ?? avatar_placeholder(trim((string) ($hekim['unvan'] ?? '').' '.(string) ($hekim['ad_soyad'] ?? ''))) }}"
                  alt="{{ $hekim['ad_soyad'] }}">
             @if(!empty($hekim['randevuya_acik_mi']))
                 <div class="media-badge"><strong>Randevuya açık</strong><span>Online talep</span></div>

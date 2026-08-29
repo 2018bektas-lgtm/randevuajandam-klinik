@@ -83,7 +83,7 @@
                                                 data-search="{{ e($search) }}">
                                             <span class="mp-book-svc-media">
                                                 @if($img)
-                                                    <img src="{{ $img }}" alt="" loading="lazy">
+                                                    <img src="{{ $img }}" alt="{{ $ad }}" loading="lazy">
                                                 @else
                                                     ✚
                                                 @endif

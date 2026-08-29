@@ -5,7 +5,7 @@
     $photo = $doktor['logo']
         ?? $doktor['profil_resmi']
         ?? ($doktor['galeri'][0]['image'] ?? null)
-        ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80';
+        ?? image_placeholder();
 @endphp
 @section('baslik', 'Hakkımızda | '.$klinikAd)
 @section('meta_aciklama', $doktor['kisa_bio'] ?? $doktor['bio'] ?? '')
@@ -86,7 +86,7 @@
             @foreach (array_slice($doktor['hekimler'], 0, 6) as $hekim)
                 <article class="team-card">
                     <a href="{{ route('frontend.hekim.detay', $hekim['slug']) }}" class="team-card-media">
-                        <img src="{{ $hekim['profil_resmi'] ?? 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=600&q=80' }}"
+                        <img src="{{ $hekim['profil_resmi'] ?? avatar_placeholder(trim((string) ($hekim['unvan'] ?? '').' '.(string) ($hekim['ad_soyad'] ?? ''))) }}"
                              alt="{{ $hekim['ad_soyad'] }}" loading="lazy">
                     </a>
                     <div class="team-card-body">

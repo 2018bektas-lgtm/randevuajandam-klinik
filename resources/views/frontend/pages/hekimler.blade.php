@@ -23,7 +23,7 @@
             @forelse (($doktor['hekimler'] ?? []) as $hekim)
                 <article class="team-card team-card-lg">
                     <a href="{{ route('frontend.hekim.detay', $hekim['slug']) }}" class="team-card-media">
-                        <img src="{{ $hekim['profil_resmi'] ?? 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=800&q=80' }}"
+                        <img src="{{ $hekim['profil_resmi'] ?? avatar_placeholder(trim((string) ($hekim['unvan'] ?? '').' '.(string) ($hekim['ad_soyad'] ?? ''))) }}"
                              alt="{{ $hekim['ad_soyad'] }}" loading="lazy">
                         @if(!empty($hekim['randevuya_acik_mi']))
                             <span class="team-badge">Randevuya açık</span>

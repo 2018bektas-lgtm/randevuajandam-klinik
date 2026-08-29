@@ -22,7 +22,7 @@
             @forelse (($doktor['egitimler'] ?? []) as $e)
                 <a href="{{ route('frontend.egitim.detay', $e['slug'] ?? $e['id'] ?? '') }}" class="mp-svc-card">
                     @if(!empty($e['image']))
-                        <img src="{{ $e['image'] }}" alt="" style="width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:14px" loading="lazy">
+                        <img src="{{ $e['image'] }}" alt="{{ $e['baslik'] ?? 'Egitim' }}" style="width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:14px" loading="lazy">
                     @else
                         <div class="mp-svc-icon">🎓</div>
                     @endif

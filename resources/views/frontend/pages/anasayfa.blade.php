@@ -13,9 +13,9 @@
     $photo = $doktor['logo']
         ?? $doktor['profil_resmi']
         ?? ($doktor['hekimler'][0]['profil_resmi'] ?? null)
-        ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80';
+        ?? image_placeholder();
     $clinicHeroImg = $doktor['galeri'][0]['image']
-        ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=85';
+        ?? image_placeholder();
     $bolum = $doktor['anasayfa_bolumler'] ?? [];
     $basliklar = $doktor['bolum_basliklar'] ?? [];
     $sira = $doktor['anasayfa_sira'] ?? [
@@ -78,7 +78,7 @@
                     'alt' => 'Randevu talebiniz klinik paneline anında düşer; onay sonrası bilgilendirilirsiniz.',
                     'etiket' => 'Randevu',
                     'badge' => '7/24 talep',
-                    'image' => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=85',
+                    'image' => image_placeholder(),
                     'thumb' => $photo,
                     'cta' => 'Randevu Oluştur',
                     'cta_url' => route('frontend.randevu'),

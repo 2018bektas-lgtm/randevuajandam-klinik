@@ -8,7 +8,7 @@
     <div class="th-modern-inner">
         <a href="{{ route('frontend.anasayfa') }}" class="th-modern-brand">
             @if(!empty($doktor['logo']))
-                <img src="{{ $doktor['logo'] }}" alt="" class="th-modern-logo">
+                <img src="{{ $doktor['logo'] }}" alt="{{ $klinikAd ?? $doktor['klinik_adi'] ?? 'Klinik' }}" class="th-modern-logo" loading="lazy" decoding="async">
             @else
                 <span class="th-modern-mark">{{ mb_strtoupper(mb_substr($doktor['ad_soyad'] ?? 'H', 0, 1)) }}</span>
             @endif

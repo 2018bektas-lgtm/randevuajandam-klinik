@@ -5,7 +5,7 @@
 
 @section('icerik')
 @php
-    $photo = $doktor['profil_resmi'] ?? 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80';
+    $photo = $doktor['profil_resmi'] ?? avatar_placeholder(trim((string) ($doktor['unvan'] ?? '').' '.(string) ($doktor['ad_soyad'] ?? '')));
     $hizmetler = collect($doktor['hizmetler'] ?? [])->take(4);
 @endphp
 
@@ -23,7 +23,7 @@
 
 <section class="th-min-photo-band">
     <div class="container">
-        <img src="{{ $photo }}" alt="" class="th-min-hero-img">
+        <img src="{{ $photo }}" alt="{{ $klinikAd ?? $doktor['klinik_adi'] ?? 'Klinik' }}" class="th-min-hero-img" loading="eager" fetchpriority="high" decoding="async">
     </div>
 </section>
 

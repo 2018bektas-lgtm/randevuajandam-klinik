@@ -14,6 +14,8 @@
     $sosyal = array_filter($doktor['sosyal'] ?? [], fn ($u) => filled($u));
 @endphp
 <body class="custom-cursor theme-delogis layout-delogis theme-pack-delogis">
+    @include('frontend.partials.erisilebilirlik')
+
     @include('frontend.layouts.partials.tracking-body')
 
     <div class="custom-cursor__cursor"></div>
@@ -26,7 +28,9 @@
     <div class="page-wrapper">
         @include('frontend.themes.delogis.layouts.partials.header', ['doktor' => $doktor ?? [], 'nav' => $nav])
 
-        @yield('icerik')
+        <main id="ana-icerik" tabindex="-1">
+            @yield('icerik')
+        </main>
 
         @include('frontend.themes.delogis.layouts.partials.footer', ['doktor' => $doktor ?? [], 'nav' => $nav])
     </div>
@@ -38,7 +42,7 @@
             <div class="logo-box">
                 <a href="{{ route('frontend.anasayfa') }}" aria-label="logo">
                     @if($logo)
-                        <img src="{{ $logo }}" width="135" alt="{{ $adSoyad }}">
+                        <img src="{{ $logo }}" width="135" alt="{{ $adSoyad }}" loading="lazy" decoding="async">
                     @else
                         <strong style="color:#fff">{{ $adSoyad }}</strong>
                     @endif
