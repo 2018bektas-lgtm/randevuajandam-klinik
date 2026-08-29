@@ -1,0 +1,37 @@
+/*
+ * Panel arayüzü — Tailwind v4 (Vite ile derlenir).
+ *
+ * Daha önce panel `https://cdn.tailwindcss.com` (Tailwind Play CDN) ile
+ * çalışıyordu. Play CDN üretim için tasarlanmamıştır: CSS her sayfa açılışında
+ * tarayıcıda derlenir (~300 KB JS + derleme maliyeti), FOUC oluşur ve CDN
+ * engellenirse panel tamamen stilsiz kalır — mobil menü sınıfları
+ * (`-translate-x-full`, `md:hidden`) da üretilmediği için sidebar ekranı
+ * kaplar ve panel kullanılamaz hale gelir.
+ *
+ * Derleme:  npm ci && npm run build   → public/build/
+ */
+
+@import 'tailwindcss';
+
+@source '../views/**/*.blade.php';
+@source '../../app/**/*.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/*
+ * Panel layout'undaki eski satır içi `tailwind.config` karşılığı.
+ * Not: brand-200 kullanımda olduğu halde eski config'de TANIMSIZDI
+ * (panel/site-ayarlari/menu.blade.php) — burada tanımlanarak düzeltildi.
+ */
+@theme {
+    --color-brand-50: #fff7ed;
+    --color-brand-100: #ffedd5;
+    --color-brand-200: #f3d5b5;
+    --color-brand-500: #c96a2b;
+    --color-brand-600: #b55a20;
+    --color-brand-700: #9a4a18;
+
+    --color-ink: #111827;
+
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-display: 'Outfit', 'Inter', sans-serif;
+}

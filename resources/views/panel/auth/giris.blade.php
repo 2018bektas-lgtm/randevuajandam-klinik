@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hekim Girişi · Yönetim</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>body{font-family:Inter,system-ui,sans-serif}.font-display{font-family:Outfit,Inter,sans-serif}</style>
+    {{-- Tailwind: Vite ile derlenir (eskiden Play CDN idi — uretimde kullanilmamali) --}}
+    @vite('resources/css/panel.css')
 </head>
 <body class="min-h-screen bg-[#F5F5F4] flex items-center justify-center p-4">
 @php

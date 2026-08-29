@@ -8,23 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { 50:'#FFF7ED', 100:'#FFEDD5', 500:'#C96A2B', 600:'#B55A20', 700:'#9A4A18' },
-                        ink: '#111827'
-                    },
-                    fontFamily: {
-                        sans: ['Inter','system-ui','sans-serif'],
-                        display: ['Outfit','Inter','sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+    {{-- Tailwind: Vite ile derlenir (eskiden Play CDN idi — uretimde kullanilmamali) --}}
+    @vite('resources/css/panel.css')
     <style>
         html, body { height: 100%; }
         body { font-family: Inter, system-ui, sans-serif; background: #F5F5F4; }
@@ -172,6 +157,9 @@
                     <ul class="list-disc pl-4">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
                 </div>
             @endif
+
+            {{-- Alan bazli hata isaretleme (tum panel formlarini kapsar) --}}
+            @include('panel.partials.form-hatalari')
 
             @yield('icerik')
         </main>
