@@ -394,8 +394,11 @@ class SiteAyarlariController extends Controller
     public function kaydetGenel(Request $request)
     {
         $request->validate([
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg,gif', 'max:4096'],
-            'favicon' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,ico,gif,svg', 'max:1024'],
+            // SVG kabul edilmiyor: dosya sitenin kendi origin'inden servis edildigi
+            // icin <script>/on* tasiyan bir SVG depolanmis XSS'e donusur.
+            // (UploadController::image() de ayni nedenle SVG'yi disarida birakir.)
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
+            'favicon' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,ico,gif', 'max:1024'],
             'tema_renk' => ['nullable', 'string', 'max:20'],
             'tema_id' => ['nullable', 'string', 'max:40'],
         ]);

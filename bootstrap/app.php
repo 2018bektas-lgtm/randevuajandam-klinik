@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'panel.paket' => \App\Http\Middleware\RequirePaketOzellik::class,
         ]);
 
+        // HTTPS + guvenlik basliklari (HSTS, nosniff, X-Frame-Options, ...)
+        $middleware->append(\App\Http\Middleware\ForceHttps::class);
+        // CSP — varsayilan rapor modu (bkz. config/csp.php)
+        $middleware->append(\App\Http\Middleware\ContentSecurityPolicy::class);
+
         $middleware->validateCsrfTokens(except: [
             'webhook/receiver',
         ]);

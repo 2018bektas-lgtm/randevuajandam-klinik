@@ -67,7 +67,7 @@
                                     <img src="" alt="" id="logoPreviewImg" class="sa-upload-img sa-upload-img-logo hidden">
                                 @endif
                             </div>
-                            <input type="file" name="logo" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+                            <input type="file" name="logo" id="logoInput" accept="image/png,image/jpeg,image/webp,image/gif"
                                    class="sa-file" onchange="saPreviewFile(this, 'logoPreviewImg', 'logoPreviewPh')">
                             <p class="sa-help">Max 4 MB · yatay logo (ör. 320×80) en iyi sonucu verir.</p>
                             @if(!empty($ayarlar['logo_url']))
@@ -92,7 +92,7 @@
                                     <img src="" alt="" id="faviconPreviewImg" class="sa-upload-img sa-upload-img-fav hidden">
                                 @endif
                             </div>
-                            <input type="file" name="favicon" id="faviconInput" accept="image/png,image/jpeg,image/webp,image/x-icon,image/vnd.microsoft.icon,.ico,image/svg+xml,image/gif"
+                            <input type="file" name="favicon" id="faviconInput" accept="image/png,image/jpeg,image/webp,image/x-icon,image/vnd.microsoft.icon,.ico,image/gif"
                                    class="sa-file" onchange="saPreviewFile(this, 'faviconPreviewImg', 'faviconPreviewPh')">
                             <p class="sa-help">Max 1 MB · kare 32×32 veya 64×64 PNG/ICO önerilir.</p>
                             @if(!empty($ayarlar['favicon_url']))
