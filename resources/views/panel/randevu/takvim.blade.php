@@ -654,6 +654,18 @@
             selectAllow: function (info) {
                 return info.start >= new Date();
             },
+            /*
+             * Suruklemenin `selectAllow` karsiligi. Bu olmadan blok gecmis
+             * bir saate BIRAKILABILIYOR, sonra reddedilip geri sicriyordu;
+             * kullaniciya "surukle birak calismiyor" gibi gorunuyordu.
+             * Artik gecmis saatler surukleme sirasinda hic kabul edilmiyor.
+             */
+            eventAllow: function (bilgi, tasinanOlay) {
+                if (tasinanOlay && tasinanOlay.display === 'background') {
+                    return false;
+                }
+                return bilgi.start >= new Date();
+            },
             select: function (info) {
                 const d = info.start;
                 const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');

@@ -100,10 +100,10 @@
                                 <div class="text-xs text-[#9CA3AF] mt-0.5">{{ $odeme->odeme_tarihi ? $odeme->odeme_tarihi->format('d.m.Y') : $odeme->created_at->format('d.m.Y') }}</div>
                             </td>
                             <td class="p-4">
-                                @if($odeme->finansKategori)
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: {{ $odeme->finansKategori->renk }}22; color: {{ $odeme->finansKategori->renk }}">
-                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $odeme->finansKategori->renk }}"></span>
-                                        {{ $odeme->finansKategori->ad }}
+                                @if($odeme->finans_kategori ?? null)
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: {{ $odeme->finans_kategori->renk }}22; color: {{ $odeme->finans_kategori->renk }}">
+                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $odeme->finans_kategori->renk }}"></span>
+                                        {{ $odeme->finans_kategori->ad }}
                                     </span>
                                 @endif
                                 @if($odeme->hizmet)
@@ -132,7 +132,7 @@
                                         class="p-1.5 text-[#6B7280] hover:text-emerald-600 transition-colors" title="Ödeme Ekle">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </button>
-                                    <button onclick="kalemleriGoster({{ $odeme->id }})" class="p-1.5 text-[#6B7280] hover:text-blue-600 transition-colors" title="Ödeme Geçmişi ({{ $odeme->kalemler->count() }})">
+                                    <button onclick="kalemleriGoster({{ $odeme->id }})" class="p-1.5 text-[#6B7280] hover:text-blue-600 transition-colors" title="Ödeme Geçmişi ({{ count($odeme->kalemler ?? []) }})">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                                     </button>
                                     <button onclick="editGelirModal({{ json_encode($odeme) }})" class="p-1.5 text-[#6B7280] hover:text-[#C96A2B] transition-colors" title="Düzenle">
@@ -150,9 +150,9 @@
                         <!-- Ödeme Kalemleri Satırı -->
                         <tr id="kalemler-{{ $odeme->id }}" class="hidden bg-blue-50/30">
                             <td colspan="7" class="px-6 pb-4 pt-2">
-                                @if($odeme->kalemler->count() > 0)
+                                @if(count($odeme->kalemler ?? []) > 0)
                                     <div class="rounded-xl border border-blue-100 overflow-hidden">
-                                        <div class="px-4 py-2 bg-blue-50 text-xs font-bold text-blue-700 uppercase tracking-wider">Ödeme Geçmişi — {{ $odeme->kalemler->count() }} kayıt</div>
+                                        <div class="px-4 py-2 bg-blue-50 text-xs font-bold text-blue-700 uppercase tracking-wider">Ödeme Geçmişi — {{ count($odeme->kalemler ?? []) }} kayıt</div>
                                         <table class="w-full text-xs">
                                             <thead class="bg-white border-b border-blue-100">
                                                 <tr>

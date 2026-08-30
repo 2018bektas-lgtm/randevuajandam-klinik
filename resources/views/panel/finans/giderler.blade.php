@@ -77,10 +77,10 @@
                         <tr class="hover:bg-[#FAFAFA]/50 transition-colors">
                             <td class="p-4 font-semibold">{{ $gider->baslik }}</td>
                             <td class="p-4">
-                                @if($gider->finansKategori)
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: {{ $gider->finansKategori->renk }}22; color: {{ $gider->finansKategori->renk }}">
-                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $gider->finansKategori->renk }}"></span>
-                                        {{ $gider->finansKategori->ad }}
+                                @if($gider->finans_kategori ?? null)
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: {{ $gider->finans_kategori->renk }}22; color: {{ $gider->finans_kategori->renk }}">
+                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $gider->finans_kategori->renk }}"></span>
+                                        {{ $gider->finans_kategori->ad }}
                                     </span>
                                 @else
                                     <span class="text-xs text-[#9CA3AF]">Kategorisiz</span>

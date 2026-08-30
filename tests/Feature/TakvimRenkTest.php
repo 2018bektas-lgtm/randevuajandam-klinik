@@ -267,4 +267,27 @@ class TakvimRenkTest extends TestCase
             );
         }
     }
+
+    /**
+     * Sürüklemenin `selectAllow` karşılığı olan `eventAllow` bulunmalı.
+     *
+     * Bildirilen sorun: "sürükle bırak kısmında hatalar var". Bu kısıt
+     * olmadan blok geçmiş bir saate bırakılabiliyor, sonra reddedilip geri
+     * sıçrıyordu; kullanıcıya sürükleme bozukmuş gibi görünüyordu.
+     */
+    public function test_surukleme_kisiti_tanimli(): void
+    {
+        $blade = $this->takvimBlade();
+
+        $this->assertStringContainsString(
+            'eventAllow:',
+            $blade,
+            'eventAllow yok; gecmis saate birakma ancak birakildiktan SONRA reddedilir.'
+        );
+        $this->assertStringContainsString(
+            'selectAllow:',
+            $blade,
+            'selectAllow yok.'
+        );
+    }
 }
