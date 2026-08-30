@@ -33,7 +33,15 @@
     /* Not: burada `border: none !important` OLMAMALI — eventDidMount
        icinde satir ici atanan durum rengi seridini (border-left) ezer
        ve tum randevular ayni soluk renkte gorunur. */
-    .fc-event { border-radius: 10px !important; cursor: pointer; box-shadow: 0 2px 8px rgba(31,41,55,.04); }
+    .fc-event { border-radius: 10px !important; cursor: pointer; box-shadow: 0 1px 3px rgba(31,41,55,.18); overflow: hidden; }
+    /* Metin dolgun zemin uzerinde beyaz; renk kaliti kesilmesin diye
+       ic elemanlar da devralir. */
+    .fc-event .fc-event-main { color: inherit !important; padding: 2px 5px !important; }
+    .fc-event .fc-event-title { font-weight: 700 !important; color: inherit !important;
+        white-space: normal !important; line-height: 1.25 !important; }
+    .fc-event .fc-event-time { font-weight: 700 !important; color: inherit !important;
+        opacity: .92; font-size: 11px !important; }
+    .fc-event.ra-iptal .fc-event-title { text-decoration: line-through; opacity: .9; }
     .fc-event:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,41,55,.08) !important; }
     .fc-highlight { background: rgba(201,106,43,.12) !important; }
     #toast { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 80; max-width: 22rem; }
@@ -43,10 +51,11 @@
     <div class="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4 text-xs text-[#4B5563]">
         <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span class="font-bold text-[#111827] font-display">Takvim Rehberi:</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#C96A2B]/20 border-l-4 border-[#C96A2B]"></span> Beklemede</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-100 border-l-4 border-emerald-500"></span> Onaylı</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 border-l-4 border-blue-500"></span> Tamamlandı</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-100 border-l-4 border-red-500"></span> İptal</span>
+            {{-- Rehber kutulari takvimdeki blok renkleriyle BIREBIR ayni olmali --}}
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded" style="background:#A85520;border-left:4px solid #7C3D14"></span> Beklemede</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded" style="background:#047857;border-left:4px solid #025C43"></span> Onaylı</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded" style="background:#1D4ED8;border-left:4px solid #1739A6"></span> Tamamlandı</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded" style="background:#B91C1C;border-left:4px solid #8E1414"></span> İptal</span>
             <span class="text-slate-400">Boş mesai saatinde tıklayarak yeni randevu ekleyin.</span>
         </div>
         <div class="flex flex-wrap items-center gap-3 shrink-0">
@@ -672,17 +681,29 @@
                 }
                 if (info.event.extendedProps.type === 'randevu') {
                     const durum = info.event.extendedProps.durum;
-                    let border = '#C96A2B', bg = 'rgba(201,106,43,0.09)', color = '#92400E';
-                    if (durum === 'onaylandi') { border = '#10B981'; bg = 'rgba(16,185,129,0.09)'; color = '#065F46'; }
-                    if (durum === 'tamamlandi') { border = '#3B82F6'; bg = 'rgba(59,130,246,0.09)'; color = '#1E40AF'; }
+
+                    /*
+                     * Dolgun zemin + beyaz metin. Eskiden zemin %9 saydamdi;
+                     * yazi okunuyordu ama bloklar beyaz izgaradan ayrismiyor,
+                     * dort durum ayni aciklikta gorunuyordu.
+                     *
+                     * Tonlar beyaz metinle WCAG AA'yi gececek sekilde secildi:
+                     *   beklemede 5.27:1 · onaylandi 5.48:1
+                     *   tamamlandi 6.70:1 · iptal 6.47:1
+                     */
+                    let bg = '#A85520', serit = '#7C3D14';          // beklemede
+                    if (durum === 'onaylandi') { bg = '#047857'; serit = '#025C43'; }
+                    if (durum === 'tamamlandi') { bg = '#1D4ED8'; serit = '#1739A6'; }
                     if (durum === 'iptal') {
-                        border = '#EF4444'; bg = 'rgba(239,68,68,0.09)'; color = '#991B1B';
+                        bg = '#B91C1C'; serit = '#8E1414';
+                        info.el.classList.add('ra-iptal');
                         info.event.setProp('editable', false);
                     }
+
                     info.el.style.backgroundColor = bg;
                     info.el.style.border = 'none';
-                    info.el.style.borderLeft = '4px solid ' + border;
-                    info.el.style.color = color;
+                    info.el.style.borderLeft = '5px solid ' + serit;
+                    info.el.style.color = '#FFFFFF';
                     info.el.style.borderRadius = '10px';
                 } else {
                     info.event.setProp('editable', false);
