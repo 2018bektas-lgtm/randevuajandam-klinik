@@ -290,4 +290,62 @@ class TakvimRenkTest extends TestCase
             'selectAllow yok.'
         );
     }
+
+    /**
+     * Takvimde randevuya tıklayınca açılan pencerede TARİH ve SAAT de
+     * düzenlenebilmeli.
+     *
+     * Bildirilen sorun: "randevu düzenleme kısmı yok; takvimde üstüne
+     * tıkladığımızda düzenlemede olmalı."
+     *
+     * Eskiden pencerede yalnızca hizmet, not, durum ve silme vardı;
+     * tarih/saat SADECE sürükleyerek değiştirilebiliyordu. Başka
+     * güne/haftaya taşıma ya da dar ekranda sürükleme zor olduğunda
+     * düzenleme yolu yoktu.
+     */
+    public function test_detay_penceresinde_tarih_saat_duzenlenebilir(): void
+    {
+        $blade = $this->takvimBlade();
+
+        foreach ([
+            'id="evTarih"' => 'Tarih alani yok',
+            'id="evSaat"' => 'Saat alani yok',
+            'function randevuKaydet(' => 'Kaydetme akisi yok',
+            'Değişiklikleri Kaydet' => 'Kaydet dugmesi yok',
+        ] as $parca => $mesaj) {
+            $this->assertStringContainsString($parca, $blade, $mesaj);
+        }
+    }
+
+    /**
+     * Kaydetme akışı MEVCUT uçları kullanmalı; yeni sunucu ucu açılmadı.
+     * Tarih/saat `reschedule`e gider (çalışma saati, çakışma ve izin
+     * doğrulamaları oradadır), hizmet/not `guncelle`ye.
+     */
+    public function test_kaydetme_mevcut_uclari_kullanir(): void
+    {
+        $blade = $this->takvimBlade();
+
+        $i = strpos($blade, 'async function randevuKaydet(');
+        $this->assertNotFalse($i, 'randevuKaydet bulunamadi.');
+
+        $govde = substr($blade, $i, 2600);
+
+        $this->assertStringContainsString('/reschedule', $govde, 'Tarih/saat reschedule ucuna gitmiyor.');
+        $this->assertStringContainsString('/guncelle', $govde, 'Hizmet/not guncelle ucuna gitmiyor.');
+    }
+
+    /**
+     * Değişiklik yokken sunucuya istek atılmamalı.
+     */
+    public function test_degisiklik_yoksa_istek_atilmaz(): void
+    {
+        $blade = $this->takvimBlade();
+
+        $this->assertStringContainsString(
+            "toast('Değişiklik yok', false)",
+            $blade,
+            'Degisiklik yokken erken cikis yok; bos istek atilir.'
+        );
+    }
 }

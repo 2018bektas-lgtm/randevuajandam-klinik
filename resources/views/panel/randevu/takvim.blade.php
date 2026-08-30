@@ -101,6 +101,17 @@
                 <div><div class="text-[10px] font-bold uppercase text-slate-400">Tarih / Saat</div><div id="evZaman" class="font-semibold"></div></div>
                 <div><div class="text-[10px] font-bold uppercase text-slate-400">Durum</div><div id="evDurum" class="font-bold text-xs uppercase text-[#C96A2B]"></div></div>
             </div>
+            {{-- Tarih/saat duzenleme: eskiden yalnizca surukleyerek degistirilebiliyordu --}}
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="evTarih" class="text-[10px] font-bold uppercase text-slate-400">Yeni tarih</label>
+                    <input type="date" id="evTarih" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label for="evSaat" class="text-[10px] font-bold uppercase text-slate-400">Yeni saat</label>
+                    <input type="time" id="evSaat" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                </div>
+            </div>
             <div>
                 <label class="text-[10px] font-bold uppercase text-slate-400">Hizmet</label>
                 <select id="evHizmetSelect" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
@@ -281,6 +292,9 @@
         hizliSave: @json(route('panel.randevu.hizli-kapat')),
     };
     let currentEventProps = null;
+    // Detay penceresi acildigindaki degerler; kaydederken
+    // nelerin degistigini anlamak icin kullaniliyor.
+    let currentEventBaslangic = null;
     const csrf = @json(csrf_token());
     const minTime = @json($minHour ?? '08:00:00');
     const maxTime = @json($maxHour ?? '20:00:00');
@@ -337,6 +351,19 @@
         document.getElementById('evHasta').textContent = props.hasta_ad || '—';
         document.getElementById('evIletisim').textContent = [props.telefon, props.e_posta].filter(Boolean).join(' · ') || '—';
         document.getElementById('evZaman').textContent = (props.tarih || '') + ' ' + (props.saat || '');
+
+        // Duzenleme alanlarini doldur; degisiklik karsilastirmasi icin
+        // baslangic degerlerini sakla.
+        const tarihEl = document.getElementById('evTarih');
+        const saatEl = document.getElementById('evSaat');
+        if (tarihEl) tarihEl.value = props.tarih || '';
+        if (saatEl) saatEl.value = (props.saat || '').substring(0, 5);
+        currentEventBaslangic = {
+            tarih: props.tarih || '',
+            saat: (props.saat || '').substring(0, 5),
+            hizmet_id: String(props.hizmet_id || ''),
+            not: props.not || '',
+        };
         document.getElementById('evHizmet').textContent = props.hizmet_ad || '—';
         document.getElementById('evDurum').textContent = props.durum || '—';
         document.getElementById('evNot').textContent = props.not || 'Belirtilmedi';
@@ -396,9 +423,9 @@
         }
         const saveBtn = document.createElement('button');
         saveBtn.type = 'button';
-        saveBtn.className = 'px-3 py-2 rounded-xl border text-xs font-bold text-slate-600';
-        saveBtn.textContent = 'Hizmet / Not Kaydet';
-        saveBtn.onclick = () => updateRandevuDetay(id);
+        saveBtn.className = 'px-3 py-2 rounded-xl bg-[#1F2937] text-white text-xs font-bold';
+        saveBtn.textContent = 'Değişiklikleri Kaydet';
+        saveBtn.onclick = () => randevuKaydet(id);
         actions.appendChild(saveBtn);
 
         const del = document.createElement('button');
@@ -410,6 +437,65 @@
 
         const m = document.getElementById('eventModal');
         m.classList.remove('hidden'); m.classList.add('flex');
+    }
+
+    /**
+     * Detay penceresindeki TUM degisiklikleri kaydeder.
+     *
+     * Tarih/saat degistiyse reschedule ucuna, hizmet/not degistiyse
+     * guncelle ucuna gider. Yeni sunucu ucu yok; ikisi de mevcut ve
+     * dogrulamalari (calisma saati, cakisma, izin) zaten yapiyor.
+     */
+    async function randevuKaydet(id) {
+        const bas = currentEventBaslangic || {};
+        const tarih = (document.getElementById('evTarih')?.value || '').trim();
+        const saat = (document.getElementById('evSaat')?.value || '').trim().substring(0, 5);
+        const hizmet_id = parseInt(document.getElementById('evHizmetSelect')?.value || '0', 10);
+        const aciklama = document.getElementById('evAciklama')?.value || '';
+
+        const zamanDegisti = (tarih && saat) && (tarih !== bas.tarih || saat !== bas.saat);
+        const detayDegisti = String(hizmet_id || '') !== String(bas.hizmet_id || '')
+            || aciklama !== (bas.not || '');
+
+        if (!zamanDegisti && !detayDegisti) {
+            toast('Değişiklik yok', false);
+            return;
+        }
+        if (detayDegisti && !hizmet_id) {
+            toast('Hizmet seçin', false);
+            return;
+        }
+
+        try {
+            // Once zaman: reddedilirse detay bosuna yazilmasin
+            if (zamanDegisti) {
+                const res = await fetch(routes.reschedule + '/' + id + '/reschedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ tarih, saat })
+                });
+                const j = await res.json().catch(() => ({}));
+                if (!res.ok || j.success === false) {
+                    throw new Error(j.message || 'Randevu taşınamadı');
+                }
+            }
+
+            if (detayDegisti) {
+                const res = await fetch(routes.guncelle + '/' + id + '/guncelle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ hizmet_id, aciklama })
+                });
+                const j = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(j.message || 'Güncellenemedi');
+            }
+
+            toast('Randevu güncellendi', true);
+            closeEventModal();
+            calendar.refetchEvents();
+        } catch (e) {
+            toast(e.message, false);
+        }
     }
 
     async function updateRandevuDetay(id) {
