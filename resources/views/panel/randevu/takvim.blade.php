@@ -30,7 +30,10 @@
     .fc-day-today { background-color: rgba(201,106,43,.02) !important; }
     .fc-timegrid-slot { height: 52px !important; border-bottom: 1px solid #F9FAFB !important; cursor: pointer; }
     .fc-timegrid-slot-label-cushion { font-size: 11px !important; font-weight: 600 !important; color: #4B5563 !important; }
-    .fc-event { border-radius: 10px !important; cursor: pointer; border: none !important; box-shadow: 0 2px 8px rgba(31,41,55,.04); }
+    /* Not: burada `border: none !important` OLMAMALI — eventDidMount
+       icinde satir ici atanan durum rengi seridini (border-left) ezer
+       ve tum randevular ayni soluk renkte gorunur. */
+    .fc-event { border-radius: 10px !important; cursor: pointer; box-shadow: 0 2px 8px rgba(31,41,55,.04); }
     .fc-event:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,41,55,.08) !important; }
     .fc-highlight { background: rgba(201,106,43,.12) !important; }
     #toast { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 80; max-width: 22rem; }
@@ -677,6 +680,7 @@
                         info.event.setProp('editable', false);
                     }
                     info.el.style.backgroundColor = bg;
+                    info.el.style.border = 'none';
                     info.el.style.borderLeft = '4px solid ' + border;
                     info.el.style.color = color;
                     info.el.style.borderRadius = '10px';
