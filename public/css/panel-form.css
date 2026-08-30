@@ -1,0 +1,91 @@
+/*
+ * Panel form denetimleri — select gorunumu.
+ *
+ * NEDEN AYRI DOSYA:
+ * Panel'in Tailwind CSS'i (resources/css/panel.css) Vite ile derleniyor ve
+ * sunucuda Node olmadigi icin public/build yerelde uretilip commitleniyor
+ * (bkz. deploy/production-optimize.sh). Bu makinede Vite derlemesi isletim
+ * sistemi ilkesiyle engellendiginden panel.css'e ekleme yapilamiyor.
+ * Bu yuzden kural, projede zaten kullanilan statik CSS deseniyle
+ * (public/css/themes/*.css) ayri dosyada tutuluyor ve panel duzeninden
+ * dogrudan yukleniyor — derleme gerektirmez.
+ *
+ * NE DUZELTIYOR:
+ * `select2-filter` / `select2-modal` / `select2-hasta-filter` siniflari
+ * randevuajandam-site projesinden kopyalanmisti. Orada jQuery + select2
+ * yukleniyor; PANELDE YUKLENMIYOR. Bu yuzden bu select'ler hicbir bicim
+ * almadan, yanlarindaki Tailwind'li input'larla tamamen uyumsuz
+ * gorunuyordu (kenarlik yok, ic bosluk yok, farkli yukseklik).
+ *
+ * select2'yi panele tasimak yerine (jQuery + ~100 KB eklenti + ek CDN
+ * izni) yerel <select> dogru bicimlendiriliyor: eriselebilir, klavyeyle
+ * kullanilabilir, mobilde isletim sisteminin kendi secicisini acar ve
+ * hic JS gerektirmez.
+ *
+ * Etkiledigi sayfalar: finans/gelirler, finans/giderler,
+ * finans/kategoriler, profil, egitim/form.
+ */
+
+select.select2-filter,
+select.select2-modal,
+select.select2-hasta-filter,
+select.ra-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 0.625rem 2.25rem 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-family: inherit;
+    color: #111827;
+    background-color: #FAFAFA;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+
+    /* Acilir ok — data: URI, dis istek yok */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+}
+
+select.select2-filter:hover,
+select.select2-modal:hover,
+select.select2-hasta-filter:hover,
+select.ra-select:hover {
+    border-color: #D1D5DB;
+}
+
+select.select2-filter:focus,
+select.select2-modal:focus,
+select.select2-hasta-filter:focus,
+select.ra-select:focus {
+    outline: none;
+    border-color: #C96A2B;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(201, 106, 43, 0.12);
+}
+
+select.select2-filter:disabled,
+select.select2-modal:disabled,
+select.select2-hasta-filter:disabled,
+select.ra-select:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* Modal icinde zemin beyaz dursun; gri kutu uzerinde gri alan olmasin */
+.modal-content select.select2-modal {
+    background-color: #fff;
+}
+
+/*
+ * Modal acikken arka plan kaymasin. Modal JS'i <body>'ye bu sinifi
+ * ekliyor; eskiden sayfa modalin arkasinda kayabiliyordu.
+ */
+body.ra-modal-acik {
+    overflow: hidden;
+}

@@ -24,7 +24,7 @@
     @endif
 
     @if($gelirKategorileri->isEmpty())
-        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3">
+        <div id="kategoriUyarisi" class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3 transition-all">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
             <span>Henüz gelir kategorisi eklemediniz. <a href="{{ route('panel.finans.kategoriler') }}" class="font-bold underline">Kategoriler sayfasından</a> ekleyebilirsiniz.</span>
         </div>
@@ -135,7 +135,16 @@
                                     <button onclick="kalemleriGoster({{ $odeme->id }})" class="p-1.5 text-[#6B7280] hover:text-blue-600 transition-colors" title="Ödeme Geçmişi ({{ count($odeme->kalemler ?? []) }})">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                                     </button>
-                                    <button onclick="editGelirModal({{ json_encode($odeme) }})" class="p-1.5 text-[#6B7280] hover:text-[#C96A2B] transition-colors" title="Düzenle">
+                                    <button onclick="editGelirModal({{ Illuminate\Support\Js::from([
+                                        'id' => $odeme->id,
+                                        'tutar' => $odeme->tutar,
+                                        'aciklama' => $odeme->aciklama ?? '',
+                                        'odeme_tarihi' => $odeme->odeme_tarihi
+                                            ? $odeme->odeme_tarihi->format('Y-m-d') : '',
+                                        'hasta_id' => $odeme->hasta_id ?? '',
+                                        'hizmet_id' => $odeme->hizmet_id ?? '',
+                                        'finans_kategori_id' => $odeme->finans_kategori_id ?? '',
+                                    ]) }})" class="p-1.5 text-[#6B7280] hover:text-[#C96A2B] transition-colors" title="Düzenle">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
                                     </button>
                                     <form action="{{ route('panel.finans.gelirler.destroy', $odeme->id) }}" method="POST" onsubmit="return confirm('Bu gelir kaydını silmek istediğinize emin misiniz?')" class="inline">
@@ -204,7 +213,7 @@
     <!-- Modal: Yeni Gelir Kaydı -->
     <div id="addGelirModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'addGelirModal')">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-lg border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form action="{{ route('panel.finans.gelirler.store') }}" method="POST">
                     @csrf
@@ -291,7 +300,7 @@
     <!-- Modal: Gelir Düzenle -->
     <div id="editGelirModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'editGelirModal')">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-lg border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form id="editGelirForm" method="POST">
                     @csrf
@@ -360,7 +369,7 @@
     <!-- Modal: Ödeme Kalemi Ekle -->
     <div id="kalemModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'kalemModal')">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-md border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form id="kalemForm" method="POST">
                     @csrf
@@ -415,127 +424,134 @@
     </div>
 
     <script>
-        function kategoriUyarisiVeYonlendir(mesaj, redirectUrl) {
-            mesajModalAc(mesaj, 'uyari');
-            const closeBtn = document.getElementById('closeAlertBtn');
-            if (closeBtn) {
-                const newCloseBtn = closeBtn.cloneNode(true);
-                closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-                newCloseBtn.addEventListener('click', function() {
-                    const modal = document.getElementById('alertModal');
-                    const container = document.getElementById('alertModalContainer');
-                    container.classList.remove('scale-100', 'opacity-100');
-                    container.classList.add('scale-95', 'opacity-0');
-                    setTimeout(() => {
-                        modal.classList.add('hidden');
-                        window.location.href = redirectUrl;
-                    }, 300);
-                });
+        /*
+         * Modal yonetimi — jQuery/select2 YOK.
+         *
+         * Eskiden closeModal() once destroyModalSelect2() cagiriyordu; o da
+         * jQuery kullaniyordu. Panelde jQuery yuklu olmadigi icin fonksiyon
+         * hata verip gizleme satirina ULASAMIYORDU: modallar kapanmiyordu.
+         *
+         * Select gorunumu artik public/css/panel-form.css ile yerel
+         * <select> olarak cozuluyor; eklenti gerekmiyor.
+         */
+        (function () {
+            'use strict';
+
+            // Sunucu adresleri Blade'den; elle yazilan yol yanlis onek
+            // uretiyordu (/hekim/... yerine /yonetim/...).
+            var rotalar = {
+                guncelle: @json(route('panel.finans.gelirler.update', ['id' => '__ID__'])),
+                kalem: @json(route('panel.finans.gelirler.kalem.store', ['id' => '__ID__'])),
+                kategoriler: @json(route('panel.finans.kategoriler')),
+            };
+
+            var acikModal = null;
+
+            function modalAc(id) {
+                var m = document.getElementById(id);
+                if (!m) { return; }
+                m.classList.remove('hidden');
+                document.body.classList.add('ra-modal-acik');
+                acikModal = id;
+
+                var ilk = m.querySelector('input:not([type=hidden]), select, textarea');
+                if (ilk) { setTimeout(function () { ilk.focus(); }, 30); }
             }
-        }
 
-        function openAddGelirModal() {
-            @if($gelirKategorileri->isEmpty())
-                kategoriUyarisiVeYonlendir('Henüz gelir kategorisi eklemediniz. Gelir kaydı oluşturabilmek için lütfen önce en az bir kategori ekleyin.', '{{ route("panel.finans.kategoriler") }}');
-            @else
-                toggleModal('addGelirModal');
-            @endif
-        }
+            function modalKapat(id) {
+                var m = document.getElementById(id || acikModal);
+                if (!m) { return; }
+                m.classList.add('hidden');
+                document.body.classList.remove('ra-modal-acik');
+                acikModal = null;
+            }
 
-        function initModalSelect2(modalId) {
-            const $modal = $('#' + modalId);
-            $modal.find('.select2-modal').each(function () {
-                if (!$(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2({
-                        dropdownParent: $modal,
-                        placeholder: 'Seçiniz...',
-                        allowClear: true,
-                        minimumResultsForSearch: 8,
-                        language: { noResults: function() { return 'Sonuç bulunamadı'; } }
-                    });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && acikModal) { modalKapat(acikModal); }
+            });
+
+            window.closeModal = modalKapat;
+
+            window.handleModalBackdropClick = function (event, id) {
+                var m = document.getElementById(id);
+                if (event.target === m || event.target.classList.contains('ra-backdrop')) {
+                    modalKapat(id);
                 }
-            });
-        }
+            };
 
-        function destroyModalSelect2(modalId) {
-            $('#' + modalId).find('.select2-modal').each(function () {
-                if ($(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2('destroy');
+            /*
+             * Kategori yoksa gelir kaydi olusturulamaz. Eskiden burada
+             * mesajModalAc() cagriliyordu; o fonksiyon PROJEDE HIC
+             * TANIMLI DEGIL, yani dugme hata veriyordu. Artik sayfanin
+             * ustundeki uyari seridine goturuyoruz.
+             */
+            window.openAddGelirModal = function () {
+                var uyari = document.getElementById('kategoriUyarisi');
+                if (uyari) {
+                    uyari.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    uyari.classList.add('ring-2', 'ring-amber-400');
+                    setTimeout(function () {
+                        uyari.classList.remove('ring-2', 'ring-amber-400');
+                    }, 1600);
+                    return;
                 }
-            });
-        }
+                modalAc('addGelirModal');
+            };
 
-        function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                initModalSelect2(modalId);
-            } else {
-                destroyModalSelect2(modalId);
-                modal.classList.add('hidden');
-            }
-        }
+            window.editGelirModal = function (odeme) {
+                document.getElementById('editGelirForm').action =
+                    rotalar.guncelle.replace('__ID__', odeme.id);
 
-        function closeModal(modalId) {
-            destroyModalSelect2(modalId);
-            document.getElementById(modalId).classList.add('hidden');
-        }
+                document.getElementById('edit_tutar').value = odeme.tutar ?? '';
+                document.getElementById('edit_aciklama').value = odeme.aciklama || '';
 
-        function handleModalBackdropClick(event, modalId) {
-            if (event.target === document.getElementById(modalId) || event.target.classList.contains('bg-gray-500')) {
-                closeModal(modalId);
-            }
-        }
+                var tarih = '';
+                if (odeme.odeme_tarihi) {
+                    // "2026-08-20 10:00:00" ya da ISO gelebilir; ilk 10 karakter yeter
+                    tarih = String(odeme.odeme_tarihi).substring(0, 10);
+                }
+                document.getElementById('edit_odeme_tarihi').value = tarih;
 
-        function editGelirModal(odeme) {
-            document.getElementById('editGelirForm').action = `/hekim/finans/gelirler/${odeme.id}/guncelle`;
-            document.getElementById('edit_tutar').value = odeme.tutar;
-            document.getElementById('edit_aciklama').value = odeme.aciklama || '';
+                sec('edit_hasta_id', odeme.hasta_id);
+                sec('edit_hizmet_id', odeme.hizmet_id);
+                sec('edit_finans_kategori_id', odeme.finans_kategori_id);
 
-            if (odeme.odeme_tarihi) {
-                const formattedDate = new Date(odeme.odeme_tarihi).toISOString().split('T')[0];
-                const tarihEl = document.getElementById('edit_odeme_tarihi');
-                tarihEl.value = formattedDate;
-                if (tarihEl._flatpickr) { tarihEl._flatpickr.setDate(formattedDate); }
+                modalAc('editGelirModal');
+            };
+
+            function sec(id, deger) {
+                var el = document.getElementById(id);
+                if (el) { el.value = (deger === null || deger === undefined) ? '' : String(deger); }
             }
 
-            const modal = document.getElementById('editGelirModal');
-            modal.classList.remove('hidden');
-            initModalSelect2('editGelirModal');
+            function paraFormatla(sayi) {
+                return Number(sayi || 0).toLocaleString('tr-TR', {
+                    minimumFractionDigits: 2, maximumFractionDigits: 2
+                }) + ' \u20BA';
+            }
 
-            $('#edit_hasta_id').val(odeme.hasta_id || '').trigger('change');
-            $('#edit_hizmet_id').val(odeme.hizmet_id || '').trigger('change');
-            $('#edit_finans_kategori_id').val(odeme.finans_kategori_id || '').trigger('change');
-        }
+            window.kalemModalAc = function (odemeId, hastaAdi, toplam, odenen) {
+                document.getElementById('kalemForm').action =
+                    rotalar.kalem.replace('__ID__', odemeId);
 
-        function kalemModalAc(odemeId, hastaAdi, toplam, odenen) {
-            document.getElementById('kalemForm').action = `/hekim/finans/gelirler/${odemeId}/kalem`;
-            document.getElementById('kalem_hasta_adi').textContent = hastaAdi;
-            document.getElementById('kalem_toplam').textContent = Number(toplam).toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' ₺';
-            document.getElementById('kalem_odenen').textContent = Number(odenen).toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' ₺';
-            document.getElementById('kalem_kalan').textContent = (Number(toplam) - Number(odenen)).toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' ₺';
+                document.getElementById('kalem_hasta_adi').textContent = hastaAdi || '';
+                document.getElementById('kalem_toplam').textContent = paraFormatla(toplam);
+                document.getElementById('kalem_odenen').textContent = paraFormatla(odenen);
 
-            const modal = document.getElementById('kalemModal');
-            modal.classList.remove('hidden');
-            initModalSelect2('kalemModal');
-        }
+                var kalan = Number(toplam || 0) - Number(odenen || 0);
+                document.getElementById('kalem_kalan').textContent = paraFormatla(kalan);
 
-        function kalemleriGoster(odemeId) {
-            document.getElementById('kalemler-' + odemeId).classList.toggle('hidden');
-        }
+                // Kalan tutari on-doldur: en sik girilen deger bu
+                var tutarEl = document.querySelector('#kalemModal input[name="tutar"]');
+                if (tutarEl && kalan > 0) { tutarEl.value = kalan.toFixed(2); }
 
-        $(document).ready(function () {
-            $('.select2-filter').select2({
-                placeholder: 'Seçiniz...',
-                allowClear: true,
-                minimumResultsForSearch: 6,
-                language: { noResults: function() { return 'Sonuç bulunamadı'; } }
-            });
-            $('.select2-hasta-filter').select2({
-                placeholder: 'Hasta ara veya seçin...',
-                allowClear: true,
-                language: { noResults: function() { return 'Hasta bulunamadı'; } }
-            });
-        });
+                modalAc('kalemModal');
+            };
+
+            window.kalemleriGoster = function (odemeId) {
+                var satir = document.getElementById('kalemler-' + odemeId);
+                if (satir) { satir.classList.toggle('hidden'); }
+            };
+        })();
     </script>
 @endsection

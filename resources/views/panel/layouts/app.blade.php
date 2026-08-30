@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     {{-- Tailwind: Vite ile derlenir (eskiden Play CDN idi — uretimde kullanilmamali) --}}
     @vite('resources/css/panel.css')
+    {{-- Form denetimleri (select gorunumu). Derleme gerektirmeyen statik
+         dosya; nedeni public/css/panel-form.css basinda aciklandi. --}}
+    <link rel="stylesheet" href="{{ asset('css/panel-form.css') }}?v=1">
     <style>
         html, body { height: 100%; }
         body { font-family: Inter, system-ui, sans-serif; background: #F5F5F4; }

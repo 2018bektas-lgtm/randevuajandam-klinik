@@ -106,7 +106,7 @@
     <!-- Modal: Yeni Kategori -->
     <div id="addKategoriModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'addKategoriModal')">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-sm border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form action="{{ route('panel.finans.kategoriler.store') }}" method="POST">
                     @csrf
@@ -150,7 +150,7 @@
     <!-- Modal: Kategori Düzenle -->
     <div id="editKategoriModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'editKategoriModal')">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-sm border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form id="editKategoriForm" method="POST">
                     @csrf
@@ -185,55 +185,77 @@
     </div>
 
     <script>
-        function initModalSelect2(modalId) {
-            const $modal = $('#' + modalId);
-            $modal.find('.select2-modal').each(function () {
-                if (!$(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2({
-                        dropdownParent: $modal,
-                        minimumResultsForSearch: Infinity,
-                        language: { noResults: function() { return 'Sonuç bulunamadı'; } }
-                    });
-                }
-            });
-        }
+        /*
+         * Modal yonetimi — jQuery/select2 YOK.
+         *
+         * Eskiden closeModal() once destroyModalSelect2() cagiriyordu; o da
+         * jQuery kullaniyordu. Panelde jQuery yuklu olmadigi icin fonksiyon
+         * hata verip gizleme satirina ULASAMIYORDU: modallar kapanmiyordu.
+         *
+         * Select gorunumu public/css/panel-form.css ile cozuluyor.
+         */
+        (function () {
+            'use strict';
 
-        function destroyModalSelect2(modalId) {
-            $('#' + modalId).find('.select2-modal').each(function () {
-                if ($(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2('destroy');
-                }
-            });
-        }
+            var rotalar = {
+                guncelle: @json(route('panel.finans.kategoriler.update', ['id' => '__ID__'])),
+            };
 
-        function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                initModalSelect2(modalId);
-            } else {
-                destroyModalSelect2(modalId);
-                modal.classList.add('hidden');
+            var acikModal = null;
+
+            function modalAc(id) {
+                var m = document.getElementById(id);
+                if (!m) { return; }
+                m.classList.remove('hidden');
+                document.body.classList.add('ra-modal-acik');
+                acikModal = id;
+
+                var ilk = m.querySelector('input:not([type=hidden]), select, textarea');
+                if (ilk) { setTimeout(function () { ilk.focus(); }, 30); }
             }
-        }
 
-        function closeModal(modalId) {
-            destroyModalSelect2(modalId);
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function handleModalBackdropClick(event, modalId) {
-            if (event.target === document.getElementById(modalId) || event.target.classList.contains('bg-gray-500')) {
-                closeModal(modalId);
+            function modalKapat(id) {
+                var m = document.getElementById(id || acikModal);
+                if (!m) { return; }
+                m.classList.add('hidden');
+                document.body.classList.remove('ra-modal-acik');
+                acikModal = null;
             }
-        }
 
-        function editKategoriModal(id, ad, renk, tur) {
-            document.getElementById('editKategoriForm').action = `/hekim/finans/kategoriler/${id}/guncelle`;
-            document.getElementById('edit_kategori_ad').value = ad;
-            document.getElementById('edit_kategori_renk').value = renk;
-            const modal = document.getElementById('editKategoriModal');
-            modal.classList.remove('hidden');
-        }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && acikModal) { modalKapat(acikModal); }
+            });
+
+            window.closeModal = modalKapat;
+            window.modalAc = modalAc;
+
+            window.toggleModal = function (id) {
+                var m = document.getElementById(id);
+                if (!m) { return; }
+                if (m.classList.contains('hidden')) { modalAc(id); } else { modalKapat(id); }
+            };
+
+            window.handleModalBackdropClick = function (event, id) {
+                var m = document.getElementById(id);
+                if (event.target === m || event.target.classList.contains('ra-backdrop')) {
+                    modalKapat(id);
+                }
+            };
+
+            function sec(id, deger) {
+                var el = document.getElementById(id);
+                if (el) { el.value = (deger === null || deger === undefined) ? '' : String(deger); }
+            }
+
+            window.editKategoriModal = function (id, ad, renk, tur) {
+                document.getElementById('editKategoriForm').action =
+                    rotalar.guncelle.replace('__ID__', id);
+
+                document.getElementById('edit_kategori_ad').value = ad || '';
+                document.getElementById('edit_kategori_renk').value = renk || '#C96A2B';
+
+                modalAc('editKategoriModal');
+            };
+        })();
     </script>
 @endsection

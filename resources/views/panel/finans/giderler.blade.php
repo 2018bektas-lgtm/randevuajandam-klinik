@@ -24,7 +24,7 @@
     @endif
 
     @if($giderKategorileri->isEmpty())
-        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3">
+        <div id="kategoriUyarisi" class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3 transition-all">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
             <span>Henüz gider kategorisi eklemediniz. <a href="{{ route('panel.finans.kategoriler') }}" class="font-bold underline">Kategoriler sayfasından</a> ekleyebilirsiniz.</span>
         </div>
@@ -128,7 +128,7 @@
     <!-- Modal: Yeni Gider -->
     <div id="addGiderModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'addGiderModal')">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-lg border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form action="{{ route('panel.finans.giderler.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -186,7 +186,7 @@
     <!-- Modal: Gider Düzenle -->
     <div id="editGiderModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" onclick="handleModalBackdropClick(event, 'editGiderModal')">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="ra-backdrop fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="modal-content relative z-10 bg-white rounded-2xl shadow-xl w-full max-w-lg border border-[#E5E7EB]" onclick="event.stopPropagation()">
                 <form id="editGiderForm" method="POST">
                     @csrf
@@ -237,104 +237,100 @@
     </div>
 
     <script>
-        function kategoriUyarisiVeYonlendir(mesaj, redirectUrl) {
-            mesajModalAc(mesaj, 'uyari');
-            const closeBtn = document.getElementById('closeAlertBtn');
-            if (closeBtn) {
-                const newCloseBtn = closeBtn.cloneNode(true);
-                closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-                newCloseBtn.addEventListener('click', function() {
-                    const modal = document.getElementById('alertModal');
-                    const container = document.getElementById('alertModalContainer');
-                    container.classList.remove('scale-100', 'opacity-100');
-                    container.classList.add('scale-95', 'opacity-0');
-                    setTimeout(() => {
-                        modal.classList.add('hidden');
-                        window.location.href = redirectUrl;
-                    }, 300);
-                });
+        /*
+         * Modal yonetimi — jQuery/select2 YOK.
+         *
+         * Eskiden closeModal() once destroyModalSelect2() cagiriyordu; o da
+         * jQuery kullaniyordu. Panelde jQuery yuklu olmadigi icin fonksiyon
+         * hata verip gizleme satirina ULASAMIYORDU: modallar kapanmiyordu.
+         *
+         * Select gorunumu public/css/panel-form.css ile cozuluyor.
+         */
+        (function () {
+            'use strict';
+
+            var rotalar = {
+                guncelle: @json(route('panel.finans.giderler.update', ['id' => '__ID__'])),
+            };
+
+            var acikModal = null;
+
+            function modalAc(id) {
+                var m = document.getElementById(id);
+                if (!m) { return; }
+                m.classList.remove('hidden');
+                document.body.classList.add('ra-modal-acik');
+                acikModal = id;
+
+                var ilk = m.querySelector('input:not([type=hidden]), select, textarea');
+                if (ilk) { setTimeout(function () { ilk.focus(); }, 30); }
             }
-        }
 
-        function openAddGiderModal() {
-            @if($giderKategorileri->isEmpty())
-                kategoriUyarisiVeYonlendir('Henüz gider kategorisi eklemediniz. Gider kaydı oluşturabilmek için lütfen önce en az bir kategori ekleyin.', '{{ route("panel.finans.kategoriler") }}');
-            @else
-                toggleModal('addGiderModal');
-            @endif
-        }
+            function modalKapat(id) {
+                var m = document.getElementById(id || acikModal);
+                if (!m) { return; }
+                m.classList.add('hidden');
+                document.body.classList.remove('ra-modal-acik');
+                acikModal = null;
+            }
 
-        function initModalSelect2(modalId) {
-            const $modal = $('#' + modalId);
-            $modal.find('.select2-modal').each(function () {
-                if (!$(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2({
-                        dropdownParent: $modal,
-                        placeholder: 'Seçiniz...',
-                        allowClear: true,
-                        minimumResultsForSearch: Infinity,
-                        language: { noResults: function() { return 'Sonuç bulunamadı'; } }
-                    });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && acikModal) { modalKapat(acikModal); }
+            });
+
+            window.closeModal = modalKapat;
+            window.modalAc = modalAc;
+
+            window.toggleModal = function (id) {
+                var m = document.getElementById(id);
+                if (!m) { return; }
+                if (m.classList.contains('hidden')) { modalAc(id); } else { modalKapat(id); }
+            };
+
+            window.handleModalBackdropClick = function (event, id) {
+                var m = document.getElementById(id);
+                if (event.target === m || event.target.classList.contains('ra-backdrop')) {
+                    modalKapat(id);
                 }
-            });
-        }
+            };
 
-        function destroyModalSelect2(modalId) {
-            $('#' + modalId).find('.select2-modal').each(function () {
-                if ($(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2('destroy');
+            function sec(id, deger) {
+                var el = document.getElementById(id);
+                if (el) { el.value = (deger === null || deger === undefined) ? '' : String(deger); }
+            }
+
+            /*
+             * Kategori yoksa gider kaydi olusturulamaz. Eskiden burada
+             * mesajModalAc() cagriliyordu; o fonksiyon PROJEDE HIC TANIMLI
+             * DEGIL, yani dugme hata veriyordu.
+             */
+            window.openAddGiderModal = function () {
+                var uyari = document.getElementById('kategoriUyarisi');
+                if (uyari) {
+                    uyari.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    uyari.classList.add('ring-2', 'ring-amber-400');
+                    setTimeout(function () {
+                        uyari.classList.remove('ring-2', 'ring-amber-400');
+                    }, 1600);
+                    return;
                 }
-            });
-        }
+                modalAc('addGiderModal');
+            };
 
-        function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                initModalSelect2(modalId);
-            } else {
-                destroyModalSelect2(modalId);
-                modal.classList.add('hidden');
-            }
-        }
+            window.editGiderModal = function (gider) {
+                document.getElementById('editGiderForm').action =
+                    rotalar.guncelle.replace('__ID__', gider.id);
 
-        function closeModal(modalId) {
-            destroyModalSelect2(modalId);
-            document.getElementById(modalId).classList.add('hidden');
-        }
+                document.getElementById('edit_gider_baslik').value = gider.baslik || '';
+                document.getElementById('edit_gider_tutar').value = gider.tutar ?? '';
+                document.getElementById('edit_gider_aciklama').value = gider.aciklama || '';
+                document.getElementById('edit_gider_tarih').value =
+                    gider.tarih ? String(gider.tarih).substring(0, 10) : '';
 
-        function handleModalBackdropClick(event, modalId) {
-            if (event.target === document.getElementById(modalId) || event.target.classList.contains('bg-gray-500')) {
-                closeModal(modalId);
-            }
-        }
+                sec('edit_gider_kategori', gider.finans_kategori_id);
 
-        function editGiderModal(gider) {
-            document.getElementById('editGiderForm').action = `/hekim/finans/giderler/${gider.id}/guncelle`;
-            document.getElementById('edit_gider_baslik').value = gider.baslik;
-            document.getElementById('edit_gider_tutar').value = gider.tutar;
-            document.getElementById('edit_gider_aciklama').value = gider.aciklama || '';
-
-            if (gider.tarih) {
-                const tarihEl = document.getElementById('edit_gider_tarih');
-                tarihEl.value = gider.tarih;
-                if (tarihEl._flatpickr) { tarihEl._flatpickr.setDate(gider.tarih); }
-            }
-
-            const modal = document.getElementById('editGiderModal');
-            modal.classList.remove('hidden');
-            initModalSelect2('editGiderModal');
-
-            $('#edit_gider_kategori').val(gider.finans_kategori_id || '').trigger('change');
-        }
-
-        $(document).ready(function () {
-            $('.select2-filter').select2({
-                placeholder: 'Seçiniz...',
-                allowClear: true,
-                minimumResultsForSearch: Infinity,
-                language: { noResults: function() { return 'Sonuç bulunamadı'; } }
-            });
-        });
+                modalAc('editGiderModal');
+            };
+        })();
     </script>
 @endsection
